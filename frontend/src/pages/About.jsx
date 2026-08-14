@@ -75,7 +75,7 @@ function About() {
           {/* Image */}
           <div className="overflow-hidden rounded-3xl border bg-muted">
             <img
-              src="/images/about/about-company.jpg"
+              src="/images/about/about-construction.jpg"
               alt="A.one Brain Construction project"
               className="aspect-[4/3] h-full w-full object-cover"
             />
@@ -176,7 +176,7 @@ function About() {
                   </div>
 
                   {/* Hover arrow */}
-                  <span className="absolute bottom-7 right-7 flex size-8 items-center justify-center rounded-full border opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100">
+                  <span className="absolute bottom-5 right-5 flex size-9 items-center justify-center rounded-full bg-black text-white opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100">
                     <ArrowUpRight className="size-4" />
                   </span>
                 </div>
@@ -187,6 +187,7 @@ function About() {
       </section>
 
       {/* Team — matching lift + shadow treatment */}
+      {/* Team */}
       <section className="border-b bg-muted/30 py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
@@ -201,29 +202,79 @@ function About() {
             </h2>
           </div>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {team.map((member) => (
               <div
                 key={member.name}
-                className="group overflow-hidden rounded-3xl border bg-background transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+                className="
+            group relative overflow-hidden rounded-3xl
+            border bg-background
+            transition-all duration-300
+            hover:-translate-y-1
+            hover:shadow-xl
+          "
               >
                 {/* Photo */}
-                <div className="aspect-[4/5] overflow-hidden bg-muted">
+                <div className="relative aspect-[4/5] overflow-hidden">
                   <img
                     src="/images/about/team-placeholder.jpg"
                     alt={member.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="
+                h-full w-full object-cover
+                transition-transform duration-500
+                group-hover:scale-105
+              "
                   />
-                </div>
 
-                <div className="p-6">
-                  <h3 className="font-semibold tracking-tight">
-                    {member.name}
-                  </h3>
+                  {/* Dark Gallery Overlay */}
+                  <div
+                    className="
+                absolute inset-0
+                bg-gradient-to-t
+                from-black/90
+                via-black/20
+                to-transparent
+                opacity-0
+                transition-opacity duration-300
+                group-hover:opacity-100
+              "
+                  />
 
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {member.role}
-                  </p>
+                  {/* Member Info */}
+                  <div
+                    className="
+                absolute inset-x-0 bottom-0
+                p-5
+                translate-y-4
+                opacity-0
+                transition-all duration-300
+                group-hover:translate-y-0
+                group-hover:opacity-100
+              "
+                  >
+                    <h3 className="font-semibold tracking-tight text-white">
+                      {member.name}
+                    </h3>
+
+                    <p className="mt-1 text-sm text-white/65">{member.role}</p>
+                  </div>
+
+                  {/* Arrow */}
+                  <div
+                    className="
+                absolute right-4 top-4
+                flex size-9 items-center justify-center
+                rounded-full
+                bg-white
+                text-slate-950
+                opacity-0
+                transition-all duration-300
+                group-hover:opacity-100
+                group-hover:translate-x-0.5
+              "
+                  >
+                    <ArrowUpRight className="size-4" />
+                  </div>
                 </div>
               </div>
             ))}

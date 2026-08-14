@@ -1,8 +1,8 @@
-import { saveToStorage } from '../services/localStore';
+import { saveToStorage } from '../services/localStorage';
 import { ENQUIRIES_STORAGE_KEY } from './slices/enquiriesSlice';
 import { TESTIMONIALS_STORAGE_KEY } from './slices/testimonialsSlice';
 import { GALLERY_STORAGE_KEY } from './slices/gallerySlice';
-import { CLIENTS_STORAGE_KEY } from './slices/clientsSlice';
+import { CLIENTS_STORAGE_KEY } from './slices/clientSlice';
 
 const PERSISTED_SLICES = {
   enquiries: { key: ENQUIRIES_STORAGE_KEY, select: (state) => state.enquiries.items },

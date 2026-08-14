@@ -1,5 +1,5 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit';
-import { loadFromStorage } from '../../services/localStore';
+import { loadFromStorage } from '../../services/localStorage';
 import { gallery as seedGallery } from '../../data/gallery';
 
 const STORAGE_KEY = 'gallery';

@@ -3,7 +3,7 @@ import authReducer from './slices/authSlice';
 import enquiriesReducer from './slices/enquiriesSlice';
 import testimonialsReducer from './slices/testimonialsSlice';
 import galleryReducer from './slices/gallerySlice';
-import clientsReducer from './slices/clientsSlice';
+import clientsReducer from "./slices/clientSlice";
 import persistMiddleware from './persistMiddleware';
 
 export const store = configureStore({

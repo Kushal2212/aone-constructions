@@ -60,29 +60,28 @@ function Hero() {
 
             {/* Secondary CTA — same sliding-text pattern, outline style */}
             <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="group relative h-12 min-w-[190px] overflow-hidden rounded-full border-slate-300 px-5 text-sm font-semibold text-slate-900 transition-all duration-300 hover:border-slate-400 hover:bg-slate-50"
-            >
-              <Link to="/projects">
-                <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
-                  View Our Projects
-                </span>
+                asChild
+                size="lg"
+                className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-white px-5 text-sm font-semibold text-primary transition-all duration-300 hover:bg-white/90"
+              >
+                <Link to="/contact">
+                  <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
+                    Start a Project
+                  </span>
 
-                <ArrowUpRight
-                  className="
-        absolute right-4 top-1/2 size-4 -translate-y-1/2
-        text-primary opacity-70
-        transition-all duration-300 ease-out
-        group-hover:right-3.5
-        group-hover:translate-x-0.5
-        group-hover:opacity-100
-        group-hover:text-sky-400
-      "
-                />
-              </Link>
-            </Button>
+                  <ArrowUpRight
+                    className="
+                      absolute right-4 top-1/2 size-4 -translate-y-1/2
+                      text-primary opacity-70
+                      transition-all duration-300 ease-out
+                      group-hover:right-3.5
+                      group-hover:translate-x-0.5
+                      group-hover:opacity-100
+                      group-hover:text-sky-400
+                    "
+                  />
+                </Link>
+              </Button>
           </div>
 
           {/* Trust information */}

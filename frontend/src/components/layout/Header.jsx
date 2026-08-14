@@ -1,8 +1,8 @@
 import { Link, NavLink } from "react-router-dom";
-import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Phone, Ship } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo/company-logo.jpg";
+
 import { navigationItems } from "@/config/navigation";
 
 function Header() {
@@ -18,7 +18,7 @@ function Header() {
               className="flex items-center gap-1.5 transition-colors duration-200 hover:text-white"
             >
               <Phone className="size-3.5" />
-              <span>+1 (234) 567-890</span>
+              <span>+977 9842209820</span>
             </a>
             <a
               href="mailto:info@aoneconstruction.com"
@@ -29,11 +29,11 @@ function Header() {
             </a>
             <span className="flex items-center gap-1.5 text-slate-400">
               <MapPin className="size-3.5" />
-              <span>123 Builder Ave, Suite 100, City, ST</span>
+              <span>A.One Construction, Pathari-Shanischare-1, Morang</span>
             </span>
           </div>
 
-          <span className="text-slate-400">Mon – Fri, 8:00 AM – 6:00 PM</span>
+          <span className="text-slate-400">Mon – Fri, 10:00 AM – 5:00 PM</span>
         </div>
       </div>
 
@@ -41,16 +41,16 @@ function Header() {
       <header className="w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
         <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand — internal route, uses Link */}
-          <Link
-            to="/"
-            aria-label="A.ONE Construction - Home"
-            className="shrink-0"
-          >
-            <img
-              src={logo}
-              alt="A.ONE Construction"
-              className="h-12 w-auto object-contain"
-            />
+          <Link to="/" className="flex w-50 flex-row items-center gap-2">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-700 text-white">
+              <Ship className="size-4 shrink-0" />
+            </div>
+
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-sm font-semibold">
+                A.one Construction
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation — internal routes, uses NavLink */}

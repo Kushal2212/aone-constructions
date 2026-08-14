@@ -23,8 +23,11 @@ export const navigationItems = [
     label: "Contact",
     href: "/contact",
   },
+  {
+    label: "Testimonials",
+    href: "/testimonials",
+  },
 ];
-
 
 export const footerNavigation = {
   company: [
@@ -43,6 +46,10 @@ export const footerNavigation = {
     {
       label: "Contact",
       href: "/contact",
+    },
+    {
+      label: "Testimonials",
+      href: "/testimonials",
     },
   ],
 

@@ -1,0 +1,32 @@
+export const clients = [
+  {
+    id: "client-1",
+    name: "Ram Kumar",
+    phone: "9800000000",
+    email: "ram@example.com",
+    address: "Pathari, Morang",
+    status: "lead",
+    notes: "Interested in house construction.",
+    createdAt: "2026-08-01",
+  },
+  {
+    id: "client-2",
+    name: "Hari Prasad",
+    phone: "9811111111",
+    email: "hari@example.com",
+    address: "Biratnagar, Morang",
+    status: "active",
+    notes: "House construction currently in progress.",
+    createdAt: "2026-08-05",
+  },
+  {
+    id: "client-3",
+    name: "Sita Rai",
+    phone: "9822222222",
+    email: "sita@example.com",
+    address: "Urlabari, Morang",
+    status: "completed",
+    notes: "Residential construction completed.",
+    createdAt: "2026-08-08",
+  },
+];

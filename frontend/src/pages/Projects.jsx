@@ -14,7 +14,7 @@ const projects = [
     category: "Residential",
     description:
       "A residential construction project delivered with attention to planning, structural execution, and finishing.",
-    image: "/images/projects/project-01.jpg",
+    image: "/projects/project-01.jpg",
   },
   {
     id: 2,
@@ -25,7 +25,7 @@ const projects = [
     category: "Commercial",
     description:
       "A commercial building project focused on practical planning, structural reliability, and efficient execution.",
-    image: "/images/projects/project-02.jpg",
+    image: "/projects/project-02.jpg",
   },
   {
     id: 3,
@@ -36,7 +36,7 @@ const projects = [
     category: "Residential",
     description:
       "A modern residential project currently progressing through construction and site execution.",
-    image: "/images/projects/project-03.jpg",
+    image: "/projects/project-03.jpg",
   },
   {
     id: 4,
@@ -47,7 +47,7 @@ const projects = [
     category: "Structural",
     description:
       "Structural construction work carried out with emphasis on quality, safety, and proper site supervision.",
-    image: "/images/projects/project-04.jpg",
+    image: "/projects/project-02.jpg",
   },
   {
     id: 5,
@@ -58,7 +58,7 @@ const projects = [
     category: "Custom",
     description:
       "A customized construction project developed around the client's specific requirements.",
-    image: "/images/projects/project-05.jpg",
+    image: "/projects/project-03.jpg",
   },
   {
     id: 6,
@@ -69,7 +69,7 @@ const projects = [
     category: "Commercial",
     description:
       "A completed building project combining practical design, construction planning, and site management.",
-    image: "/images/projects/project-06.jpg",
+    image: "/projects/project-01.jpg",
   },
 ];
 

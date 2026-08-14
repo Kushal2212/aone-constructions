@@ -4,27 +4,27 @@ const SESSION_KEY = "aone_construction_admin_session";
 
 // replace with real credential check against a backend.
 const MOCK_ADMIN = {
-  username: "admin",
+  email: "admin@gmail.com",
   password: "Admin123",
   name: "Administrator",
 };
 
-export function login({ username, password }) {
+export function login({ email, password }) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (
-        username === MOCK_ADMIN.username &&
+        email === MOCK_ADMIN.email &&
         password === MOCK_ADMIN.password
       ) {
         const session = {
-          username: MOCK_ADMIN.username,
+          email: MOCK_ADMIN.email,
           name: MOCK_ADMIN.name,
           token: `mock-token-${Date.now()}`,
         };
         window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
         resolve(session);
       } else {
-        reject(new Error("Incorrect username or password."));
+        reject(new Error("Incorrect email or password."));
       }
     }, 350);
   });

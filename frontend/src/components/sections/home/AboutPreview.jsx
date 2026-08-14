@@ -22,7 +22,7 @@ function AboutPreview() {
 
           <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-muted">
             <img
-              src="../../../../public/images/about-construction.jpg"
+              src="/images/about-construction.jpg"
               alt="A.one Brain Construction project"
               className="h-full w-full object-cover"
             />

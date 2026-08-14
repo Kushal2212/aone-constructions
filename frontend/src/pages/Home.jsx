@@ -1,4 +1,4 @@
-import Hero from "@/components/sections/home/Hero";
+import HeroParallax from "@/components/ui/hero-parallax";
 import AboutPreview from "@/components/sections/home/AboutPreview";
 import WhatWeDo from "@/components/sections/home/WhatWeDo";
 import ServicesPreview from "@/components/sections/home/ServicesPreview";
@@ -11,7 +11,7 @@ import ContactCTA from "@/components/sections/home/ContactCTA";
 function Home() {
   return (
     <main>
-      <Hero />
+      <HeroParallax />
       <AboutPreview />
       <WhatWeDo />
       <ServicesPreview />

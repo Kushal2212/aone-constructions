@@ -1,18 +1,12 @@
-
-
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import AppRoutes from "@/routes/AppRoutes";
+import { Toaster } from "@/components/ui/sonner";
 
 function App() {
   return (
-  <>
-      <Header />
-
+    <>
       <AppRoutes />
-
-      <Footer />
-   </>
+      <Toaster/>
+    </>
   );
 }
 

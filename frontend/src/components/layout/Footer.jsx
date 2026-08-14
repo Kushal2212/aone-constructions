@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
-
+import { ArrowUpRight, Mail, MapPin, Phone, Ship } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { footerNavigation } from "@/config/navigation";
 
 function Footer() {
@@ -11,30 +11,46 @@ function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
           {/* Brand */}
           <div className="max-w-sm">
-            <Link
-              to="/"
-              className="inline-block"
-              aria-label="A.ONE Construction - Home"
-            >
-              <img
-                src="/logo/company-logo.png"
-                alt="A.ONE Construction"
-                className="h-12 w-auto object-contain"
-              />
-            </Link>
+            <Link to="/" className="flex w-50 flex-row items-center gap-2">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-700 text-white">
+              <Ship className="size-4 shrink-0" />
+            </div>
+
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-sm font-semibold">
+                A.one Construction
+              </span>
+            </div>
+          </Link>
 
             <p className="mt-6 text-sm leading-6 text-slate-400">
               Building spaces with purpose, quality, and craftsmanship. We
               deliver construction solutions designed to last.
             </p>
 
-            <Link
-              to="/contact"
-              className="group mt-6 inline-flex items-center gap-2 text-sm font-medium text-white transition-colors hover:text-blue-400"
+            <Button
+              asChild
+              size="lg"
+              className="group relative h-11 min-w-[190px] overflow-hidden rounded-full bg-slate-700 px-5 text-sm font-semibold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20"
             >
-              Start a Project
-              <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </Link>
+              <Link to="/contact">
+                <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
+                  Start a Project
+                </span>
+
+                <ArrowUpRight
+                  className="
+                    absolute right-4 top-1/2 size-4 -translate-y-1/2
+                    text-white opacity-70
+                    transition-all duration-300 ease-out
+                    group-hover:right-3.5
+                    group-hover:translate-x-0.5
+                    group-hover:opacity-100
+                    group-hover:text-sky-400
+                  "
+                />
+              </Link>
+            </Button>
           </div>
 
           {/* Company */}
@@ -93,7 +109,7 @@ function Footer() {
                 className="flex items-center gap-3 text-sm text-slate-400 transition-colors hover:text-white"
               >
                 <Phone className="size-4 text-slate-500" />
-                +977 000 000 0000
+                +977 9842209820
               </a>
 
               <a

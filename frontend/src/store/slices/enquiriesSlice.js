@@ -1,5 +1,5 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit';
-import { loadFromStorage } from '../../services/localStore';
+import { loadFromStorage } from '../../services/localStorage';
 import { enquiries as seedEnquiries } from '../../data/enquiries';
 
 const STORAGE_KEY = 'enquiries';
