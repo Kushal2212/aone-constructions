@@ -10,7 +10,7 @@ function AboutPreview() {
   ];
 
   return (
-    <section className="border-b bg-background py-16 sm:py-20 lg:py-24">
+    <section className="border-b bg-background py-10 sm:py-16 lg:py-24">
       <div className="mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-20 lg:px-8">
         {/* Image */}
         <div className="relative order-2 lg:order-1">

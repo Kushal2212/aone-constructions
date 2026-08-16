@@ -17,6 +17,7 @@ import Clients from "@/pages/admin/Clients";
 import GallaryAdmin from "@/pages/admin/GalleryAdmin";
 import Testimonials from "@/pages/admin/Testimonials";
 import Settings from "@/pages/admin/Settings";
+import ProjectAdmin from "@/pages/admin/ProjectAdmin";
 import AdminLogin from "@/pages/admin/AdminLogin";
 
 import RequireAuth from "@/components/RequireAuth";
@@ -45,7 +46,8 @@ function AppRoutes() {
           <Route path="/admin/clients" element={<Clients />} />
           <Route path="/admin/gallery" element={<GallaryAdmin />} />
           <Route path="/admin/testimonials" element={<Testimonials />} />
-          <Route path="/admin/settings" element={<Settings />} />
+          <Route path="/admin/projects" element={<ProjectAdmin />} />
+          <Route path="/admin/settings" element={<Settings/>} />
         </Route>
       </Route>
     </Routes>

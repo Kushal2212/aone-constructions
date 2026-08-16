@@ -1,7 +1,10 @@
 import { ArrowUpRight, Clock3, Mail, MapPin, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useSelector } from "react-redux";
 
 function LocationPreview() {
+  const {company} = useSelector((state) => state.settings)
   return (
     <section className="border-b bg-background py-16 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -43,12 +46,12 @@ function LocationPreview() {
 
                 <div>
                   <p className="text-sm font-semibold">Office Location</p>
+                  {company.address && (
 
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Pathari-Shanischare-1,
-                    <br />
-                    Morang, Nepal
-                  </p>
+                  <span className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {company.address}
+                  </span>
+                  )}
                 </div>
               </div>
 
@@ -61,12 +64,15 @@ function LocationPreview() {
                 <div>
                   <p className="text-sm font-semibold">Phone</p>
 
+                  {company.phone && (
+
                   <a
-                    href="tel:+9770000000000"
+                    href={`${company.phone}`}
                     className="mt-1 block text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    +977 000 000 0000
+                    {company.phone}
                   </a>
+                  )}
                 </div>
               </div>
 
@@ -79,12 +85,15 @@ function LocationPreview() {
                 <div>
                   <p className="text-sm font-semibold">Email</p>
 
+                  {company.email && (
+
                   <a
-                    href="mailto:info@example.com"
+                    href={`${company.email}`}
                     className="mt-1 block text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    info@example.com
+                    {company.email}
                   </a>
+                  )}
                 </div>
               </div>
 
@@ -107,15 +116,31 @@ function LocationPreview() {
             </div>
 
             {/* Contact link */}
-            <Link
-              to="/contact"
-              className="group mt-10 inline-flex w-fit items-center gap-1.5 text-sm font-semibold"
-            >
-              <span className="border-b border-transparent pb-0.5 transition-colors duration-300 group-hover:border-current">
-                Get in touch
-              </span>
-              <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </Link>
+            <div className="hidden items-center lg:flex mt-6 flex gap-4 ">
+              <Button
+                nativeButton={false}
+                size="lg"
+                render={<Link to="/contact"/>}
+                className="group relative h-11 min-w-[190px] overflow-hidden rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20"
+              >
+                  <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
+                    Get in Touch
+                  </span>
+
+                  <ArrowUpRight
+                    className="
+                    absolute right-4 top-1/2 size-4 -translate-y-1/2
+                    text-white opacity-70
+                    transition-all duration-300 ease-out
+                    group-hover:right-3.5
+                    group-hover:translate-x-0.5
+                    group-hover:opacity-100
+                    group-hover:text-sky-400
+                  "
+                  />
+                
+              </Button>
+            </div>
           </div>
 
           {/* Map — live embed */}

@@ -2,6 +2,7 @@ import { Quote, Star } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
+import { Button } from "@base-ui/react";
 
 function Testimonials() {
   const testimonials = useSelector((state) => state.testimonials.items);
@@ -79,13 +80,31 @@ function Testimonials() {
                 </p>
               </div>
 
-              <Link
-                to="/contact"
-                className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-              >
-                Start a conversation
-                <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </Link>
+              <div className="hidden items-center lg:flex">
+                <Button
+                  nativeButton={false}
+                  size="lg"
+                  render= {<Link to="/contact"/>}
+                  className="group relative h-11 min-w-[190px] overflow-hidden rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20"
+                >
+                    <span className="absolute inset-0 flex items-center justify-center pl-2 pr-7 transition-transform duration-300 group-hover:-translate-x-2">
+                      Start a Conversation
+                    </span>
+
+                    <ArrowUpRight
+                      className="
+          absolute right-4 top-1/2 size-4 -translate-y-1/2
+          text-white opacity-70
+          transition-all duration-300 ease-out
+          group-hover:right-3.5
+          group-hover:translate-x-0.5
+          group-hover:opacity-100
+          group-hover:text-sky-400
+        "
+                    />
+                  
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -94,10 +113,7 @@ function Testimonials() {
   );
 }
 
-/* ----------------------------------
-   Testimonial Card
------------------------------------ */
-
+// Testimonial Card
 function TestimonialCard({ testimonial }) {
   const rating = Math.min(Math.max(Number(testimonial.rating) || 5, 0), 5);
 
@@ -105,8 +121,8 @@ function TestimonialCard({ testimonial }) {
     <article className="group relative flex min-h-[300px] flex-col justify-between overflow-hidden rounded-3xl border bg-background p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg sm:p-8">
       {/* Top */}
       <div className="flex items-start justify-between gap-6">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-          <Quote className="size-5 text-primary" />
+        <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 transition-colors duration-300 group-hover:bg-primary">
+          <Quote className="size-5 text-primary transition-colors duration-300 group-hover:text-white" />
         </div>
 
         <div className="flex shrink-0 gap-0.5">
@@ -150,10 +166,7 @@ function TestimonialCard({ testimonial }) {
   );
 }
 
-/* ----------------------------------
-   Empty State
------------------------------------ */
-
+// Empty State
 function EmptyTestimonials() {
   return (
     <div className="flex min-h-[300px] flex-col items-center justify-center rounded-3xl border bg-background p-8 text-center">

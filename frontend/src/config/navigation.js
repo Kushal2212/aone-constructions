@@ -56,15 +56,15 @@ export const footerNavigation = {
   services: [
     {
       label: "Residential Construction",
-      href: "/services/residential",
+      href: "/services",
     },
     {
       label: "Commercial Construction",
-      href: "/services/commercial",
+      href: "/services",
     },
     {
       label: "Renovation",
-      href: "/services/renovation",
+      href: "/services",
     },
   ],
 };

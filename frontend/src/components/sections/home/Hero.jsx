@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 function Hero() {
   return (
     <section className="relative overflow-hidden bg-background">
-      <div className="mx-auto grid min-h-[calc(100vh-4.5rem)] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-20">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 sm:gap-12 sm:px-6 sm:py-16 lg:min-h-[calc(100vh-4.5rem)] lg:grid-cols-2 lg:px-8 lg:py-20">
         {/* Content */}
         <div className="max-w-2xl">
           {/* Heading */}
@@ -60,17 +60,17 @@ function Hero() {
 
             {/* Secondary CTA — same sliding-text pattern, outline style */}
             <Button
-                asChild
-                size="lg"
-                className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-white px-5 text-sm font-semibold text-primary transition-all duration-300 hover:bg-white/90"
-              >
-                <Link to="/contact">
-                  <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
-                    Start a Project
-                  </span>
+              asChild
+              size="lg"
+              className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-white px-5 text-sm font-semibold text-primary transition-all duration-300 hover:bg-white/90"
+            >
+              <Link to="/contact">
+                <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
+                  Start a Project
+                </span>
 
-                  <ArrowUpRight
-                    className="
+                <ArrowUpRight
+                  className="
                       absolute right-4 top-1/2 size-4 -translate-y-1/2
                       text-primary opacity-70
                       transition-all duration-300 ease-out
@@ -79,9 +79,9 @@ function Hero() {
                       group-hover:opacity-100
                       group-hover:text-sky-400
                     "
-                  />
-                </Link>
-              </Button>
+                />
+              </Link>
+            </Button>
           </div>
 
           {/* Trust information */}
@@ -111,7 +111,7 @@ function Hero() {
 
         {/* Visual */}
         <div className="relative lg:pl-8">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-muted">
+          <div className="relative aspect-[4/3] sm:aspect-[4/5] overflow-hidden rounded-3xl bg-muted">
             {/* Temporary project image */}
             <img
               src="/images/hero-construction.jpg"

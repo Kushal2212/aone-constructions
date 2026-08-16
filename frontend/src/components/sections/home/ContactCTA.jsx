@@ -37,11 +37,11 @@ function ContactCTA() {
             {/* Actions */}
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
-                asChild
+                nativeButton={false}
                 size="lg"
+                render= { <Link to="/contact"/>}
                 className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-white px-5 text-sm font-semibold text-primary transition-all duration-300 hover:bg-white/90"
               >
-                <Link to="/contact">
                   <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
                     Start a Project
                   </span>
@@ -57,31 +57,31 @@ function ContactCTA() {
                       group-hover:text-sky-400
                     "
                   />
-                </Link>
+                
               </Button>
 
               <Button
-                asChild
+                nativeButton={false}
                 size="lg"
-                variant="outline"
-                className="group relative h-12 min-w-[175px] overflow-hidden rounded-full border-white/30 bg-transparent px-5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:bg-white/10"
+                render={<Link to="/contact"/>}
+                className="group relative h-11 min-w-[190px] overflow-hidden rounded-full border-slate-400 bg-slate-900 px-5 text-sm font-semibold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20"
               >
-                <a href="tel:+9770000000000">
                   <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
                     Talk to Us
                   </span>
 
                   <Phone
                     className="
-                      absolute right-4 top-1/2 size-4 -translate-y-1/2
-                      text-primary-foreground opacity-70
-                      transition-all duration-300 ease-out
-                      group-hover:right-3.5
-                      group-hover:opacity-100
-                      group-hover:text-sky-400
-                    "
+                    absolute right-4 top-1/2 size-4 -translate-y-1/2
+                    text-white opacity-70
+                    transition-all duration-300 ease-out
+                    group-hover:right-3.5
+                    group-hover:translate-x-0.5
+                    group-hover:opacity-100
+                    group-hover:text-sky-400
+                  "
                   />
-                </a>
+                
               </Button>
             </div>
           </div>

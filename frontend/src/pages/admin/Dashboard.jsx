@@ -1,3 +1,4 @@
+import AdminWelcomeCard from "@/components/admin/AdminWelComeCard";
 import {
   ArrowUpRight,
   ClipboardList,
@@ -25,9 +26,9 @@ function Dashboard() {
     (state) => state.testimonials.items,
   );
 
-  // -----------------------------
+ 
   // Dashboard statistics
-  // -----------------------------
+  
 
   const totalClients = clients.length;
 
@@ -45,9 +46,9 @@ function Dashboard() {
     (testimonial) => testimonial.published,
   ).length;
 
-  // -----------------------------
+ 
   // Recent enquiries
-  // -----------------------------
+
 
   const recentEnquiries = [...enquiries]
     .sort(
@@ -56,11 +57,9 @@ function Dashboard() {
     )
     .slice(0, 5);
 
-  // -----------------------------
+  
   // Client status
-  // -----------------------------
-
-  const clientStatuses = clientStatusConfig.map((status) => {
+   const clientStatuses = clientStatusConfig.map((status) => {
     const count = clients.filter(
       (client) => client.status === status.key,
     ).length;
@@ -90,11 +89,13 @@ function Dashboard() {
           <h1 className="mt-1 text-3xl font-bold tracking-tight">
             Dashboard
           </h1>
+          
 
           <p className="mt-2 text-sm text-muted-foreground">
             Welcome back. Here's what's happening with
             A.one Construction.
           </p>
+          
         </div>
 
         <Link
@@ -414,6 +415,7 @@ function StatCard({
       <p className="mt-1 text-xs text-muted-foreground">
         {description}
       </p>
+
 
     </div>
   );

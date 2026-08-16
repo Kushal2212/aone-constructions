@@ -9,85 +9,86 @@ import {
   Bell,
   Settings as SettingsIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
+import {
+  updateCompany,
+  updateSocial,
+  updateAdmin,
+  toggleNotification,
+} from "@/store/slices/settingsSlice";
+
+const sidebarItems = [
+  { key: "general", label: "General", icon: SettingsIcon },
+  { key: "admin", label: "Admin Profile", icon: User },
+  { key: "notifications", label: "Notifications", icon: Bell },
+];
+
 function Settings() {
-  const [company, setCompany] = useState({
-    name: "A.one Brain Construction Pvt. Ltd.",
-    email: "",
-    phone: "",
-    address: "Pathari-Shanischare-1, Morang, Nepal",
-    website: "",
-  });
+  const dispatch = useDispatch();
+  const { company, social, admin, notifications } = useSelector(
+    (state) => state.settings,
+  );
 
-  const [social, setSocial] = useState({
-    
-    linkedin: "",
-  });
+  // Local draft state for editing before save, so typing doesn't
+  // hit Redux/localStorage on every keystroke.
+  const [companyDraft, setCompanyDraft] = useState(company);
+  const [socialDraft, setSocialDraft] = useState(social);
+  const [adminDraft, setAdminDraft] = useState(admin);
 
-  const [admin, setAdmin] = useState({
-    name: "Admin",
-    email: "",
-  });
+  const [activeSection, setActiveSection] = useState("general");
 
-  const [notifications, setNotifications] = useState({
-    newEnquiry: true,
-    newClient: true,
-    testimonial: false,
-  });
+  const sectionRefs = {
+    general: useRef(null),
+    admin: useRef(null),
+    notifications: useRef(null),
+  };
+
+  const scrollToSection = (key) => {
+    setActiveSection(key);
+    sectionRefs[key]?.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   const handleCompanyChange = (e) => {
     const { name, value } = e.target;
-
-    setCompany((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setCompanyDraft((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSocialChange = (e) => {
     const { name, value } = e.target;
-
-    setSocial((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setSocialDraft((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAdminChange = (e) => {
     const { name, value } = e.target;
-
-    setAdmin((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setAdminDraft((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCompanySave = (e) => {
     e.preventDefault();
-
+    dispatch(updateCompany(companyDraft));
     toast.success("Company information saved successfully");
   };
 
   const handleSocialSave = (e) => {
     e.preventDefault();
-
+    dispatch(updateSocial(socialDraft));
     toast.success("Social links saved successfully");
   };
 
   const handleAdminSave = (e) => {
     e.preventDefault();
-
+    dispatch(updateAdmin(adminDraft));
     toast.success("Admin profile saved successfully");
   };
 
   const handleNotificationChange = (key) => {
-    setNotifications((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-
+    dispatch(toggleNotification(key));
     toast.success("Notification preference updated");
   };
 
@@ -107,137 +108,147 @@ function Settings() {
       {/* Settings navigation */}
       <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
         {/* Left menu */}
-        <aside className="h-fit rounded-2xl border bg-background p-2">
-          <div className="flex items-center gap-3 rounded-xl bg-primary/10 px-3 py-3 text-sm font-medium text-primary">
-            <SettingsIcon className="size-4" />
-            General
-          </div>
+        <aside className="h-fit rounded-2xl border bg-background p-2 lg:sticky lg:top-6">
+          {sidebarItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeSection === item.key;
 
-          <div className="mt-1 flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-muted-foreground">
-            <User className="size-4" />
-            Admin Profile
-          </div>
-
-          <div className="mt-1 flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-muted-foreground">
-            <Bell className="size-4" />
-            Notifications
-          </div>
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => scrollToSection(item.key)}
+                className={`mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium transition-colors first:mt-0 ${
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <Icon className="size-4 shrink-0" />
+                {item.label}
+              </button>
+            );
+          })}
         </aside>
 
         {/* Main settings */}
         <div className="min-w-0 space-y-6">
-          {/* Company Information */}
-          <section className="rounded-2xl border bg-background">
-            <div className="border-b p-6">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
-                  <Building2 className="size-5 text-primary" />
-                </div>
+          {/* General: Company Information + Social Media */}
+          <div ref={sectionRefs.general} className="scroll-mt-6 space-y-6">
+            {/* Company Information */}
+            <section className="rounded-2xl border bg-background">
+              <div className="border-b p-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+                    <Building2 className="size-5 text-primary" />
+                  </div>
 
-                <div>
-                  <h2 className="font-semibold">Company Information</h2>
+                  <div>
+                    <h2 className="font-semibold">Company Information</h2>
 
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Information displayed throughout your website.
-                  </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Information displayed throughout your website.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <form onSubmit={handleCompanySave} className="space-y-5 p-6">
-              {/* Company name */}
-              <InputField
-                label="Company Name"
-                name="name"
-                value={company.name}
-                onChange={handleCompanyChange}
-                icon={Building2}
-                placeholder="Company name"
-              />
-
-              <div className="grid gap-5 md:grid-cols-2">
-                {/* Email */}
+              <form onSubmit={handleCompanySave} className="space-y-5 p-6">
+                {/* Company name */}
                 <InputField
-                  label="Company Email"
-                  name="email"
-                  type="email"
-                  value={company.email}
+                  label="Company Name"
+                  name="name"
+                  value={companyDraft.name}
                   onChange={handleCompanyChange}
-                  icon={Mail}
-                  placeholder="company@example.com"
+                  icon={Building2}
+                  placeholder="Company name"
                 />
 
-                {/* Phone */}
+                <div className="grid gap-5 md:grid-cols-2">
+                  {/* Email */}
+                  <InputField
+                    label="Company Email"
+                    name="email"
+                    type="email"
+                    value={companyDraft.email}
+                    onChange={handleCompanyChange}
+                    icon={Mail}
+                    placeholder="company@example.com"
+                  />
+
+                  {/* Phone */}
+                  <InputField
+                    label="Phone Number"
+                    name="phone"
+                    value={companyDraft.phone}
+                    onChange={handleCompanyChange}
+                    icon={Phone}
+                    placeholder="+977 98XXXXXXXX"
+                  />
+                </div>
+
+                {/* Address */}
                 <InputField
-                  label="Phone Number"
-                  name="phone"
-                  value={company.phone}
+                  label="Address"
+                  name="address"
+                  value={companyDraft.address}
                   onChange={handleCompanyChange}
-                  icon={Phone}
-                  placeholder="+977 98XXXXXXXX"
+                  icon={MapPin}
+                  placeholder="Company address"
                 />
-              </div>
 
-              {/* Address */}
-              <InputField
-                label="Address"
-                name="address"
-                value={company.address}
-                onChange={handleCompanyChange}
-                icon={MapPin}
-                placeholder="Company address"
-              />
+                {/* Website */}
+                <InputField
+                  label="Website"
+                  name="website"
+                  value={companyDraft.website}
+                  onChange={handleCompanyChange}
+                  icon={Globe}
+                  placeholder="https://example.com"
+                />
 
-              {/* Website */}
-              <InputField
-                label="Website"
-                name="website"
-                value={company.website}
-                onChange={handleCompanyChange}
-                icon={Globe}
-                placeholder="https://example.com"
-              />
+                <SaveButton />
+              </form>
+            </section>
 
-              <SaveButton />
-            </form>
-          </section>
+            {/* Social Media */}
+            <section className="rounded-2xl border bg-background">
+              <div className="border-b p-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+                    <Globe className="size-5 text-primary" />
+                  </div>
 
-          {/* Social Media */}
-          <section className="rounded-2xl border bg-background">
-            <div className="border-b p-6">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
-                  <Globe className="size-5 text-primary" />
-                </div>
+                  <div>
+                    <h2 className="font-semibold">Social Media</h2>
 
-                <div>
-                  <h2 className="font-semibold">Social Media</h2>
-
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Add your company's social media profiles.
-                  </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Add your company's social media profiles.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <form onSubmit={handleSocialSave} className="space-y-5 p-6">
-              
+              <form onSubmit={handleSocialSave} className="space-y-5 p-6">
+                <InputField
+                  label="LinkedIn"
+                  name="linkedin"
+                  value={socialDraft.linkedin}
+                  onChange={handleSocialChange}
+                  icon={Globe}
+                  placeholder="LinkedIn profile URL"
+                />
 
-              <InputField
-                label="LinkedIn"
-                name="linkedin"
-                value={social.linkedin}
-                onChange={handleSocialChange}
-                icon={Globe}
-                placeholder="LinkedIn profile URL"
-              />
-
-              <SaveButton />
-            </form>
-          </section>
+                <SaveButton />
+              </form>
+            </section>
+          </div>
 
           {/* Admin Profile */}
-          <section className="rounded-2xl border bg-background">
+          <section
+            ref={sectionRefs.admin}
+            className="scroll-mt-6 rounded-2xl border bg-background"
+          >
             <div className="border-b p-6">
               <div className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
@@ -258,7 +269,7 @@ function Settings() {
               <InputField
                 label="Admin Name"
                 name="name"
-                value={admin.name}
+                value={adminDraft.name}
                 onChange={handleAdminChange}
                 icon={User}
                 placeholder="Admin name"
@@ -268,7 +279,7 @@ function Settings() {
                 label="Admin Email"
                 name="email"
                 type="email"
-                value={admin.email}
+                value={adminDraft.email}
                 onChange={handleAdminChange}
                 icon={Mail}
                 placeholder="admin@example.com"
@@ -279,7 +290,10 @@ function Settings() {
           </section>
 
           {/* Notifications */}
-          <section className="rounded-2xl border bg-background">
+          <section
+            ref={sectionRefs.notifications}
+            className="scroll-mt-6 rounded-2xl border bg-background"
+          >
             <div className="border-b p-6">
               <div className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
@@ -325,9 +339,9 @@ function Settings() {
   );
 }
 
-/* ----------------------------------
-   Input Field
------------------------------------ */
+
+ //  Input Field
+
 
 function InputField({
   label,
@@ -361,9 +375,9 @@ function InputField({
   );
 }
 
-/* ----------------------------------
-   Save Button
------------------------------------ */
+
+ //  Save Button
+
 
 function SaveButton() {
   return (
@@ -379,9 +393,9 @@ function SaveButton() {
   );
 }
 
-/* ----------------------------------
-   Notification Row
------------------------------------ */
+
+ //  Notification Row
+
 
 function NotificationRow({ title, description, checked, onChange }) {
   return (

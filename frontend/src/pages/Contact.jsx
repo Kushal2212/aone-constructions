@@ -1,7 +1,9 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import ContactForm from "@/components/contact/ContactForm";
+import { useSelector } from "react-redux";
 
 function Contact() {
+  const {company} = useSelector((state)=>state.settings)
   return (
     <main>
       {/* Page Hero */}
@@ -57,12 +59,12 @@ function Contact() {
                   <p className="text-sm font-semibold">
                     Office
                   </p>
+                  {company.address && (
 
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Pathari-Shanischare-1,
-                    <br />
-                    Morang, Nepal
-                  </p>
+                  <span className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {company.address}
+                  </span>
+                  )}
                 </div>
               </div>
 
@@ -76,13 +78,15 @@ function Contact() {
                   <p className="text-sm font-semibold">
                     Phone
                   </p>
+                  {company.phone && (
 
                   <a
-                    href="tel:+9770000000000"
+                    href={`${company.phone}`}
                     className="mt-1 block text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    +977 000 000 0000
+                    {company.phone}
                   </a>
+                  )}
                 </div>
               </div>
 
@@ -96,13 +100,15 @@ function Contact() {
                   <p className="text-sm font-semibold">
                     Email
                   </p>
+                  {company.email && (
 
                   <a
-                    href="mailto:info@example.com"
+                    href={`${company.email}`}
                     className="mt-1 block text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    info@example.com
+                    {`${company.email}`}
                   </a>
+                  )}
                 </div>
               </div>
 

@@ -6,12 +6,14 @@ import {
   Users,
   Ship,
   Settings,
+  Construction,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -19,7 +21,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
+
+import AdminWelcomeCard from "@/components/admin/AdminWelcomeCard";
 
 const overviewItems = [
   {
@@ -50,6 +55,11 @@ const managementItems = [
     url: "/admin/testimonials",
     icon: Star,
   },
+  {
+    title: "Projects",
+    url: "/admin/projects",
+    icon: Construction,
+  },
 ];
 
 const otherItems = [
@@ -62,18 +72,24 @@ const otherItems = [
 
 function AdminSidebar() {
   const location = useLocation();
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  const closeOnMobile = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   return (
     <Sidebar collapsible="icon">
       {/* Logo */}
-      <SidebarHeader className="p-2">
+      <SidebarHeader className="gap-2 p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild size="lg" className="h-12">
-              <Link
-                to="/admin"
-                className="flex w-full flex-row items-center gap-2"
-              >
+            <SidebarMenuButton
+              render={<Link to="/admin" onClick={closeOnMobile} />}
+              size="lg"
+              className="h-12"
+            >
+              <div className="flex w-full flex-row items-center gap-2">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-950 text-white">
                   <Ship className="size-4 shrink-0" />
                 </div>
@@ -87,13 +103,18 @@ function AdminSidebar() {
                     Admin Panel
                   </span>
                 </div>
-              </Link>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+
+        {/* Admin welcome card */}
+        <div className="border-t pt-2">
+          <AdminWelcomeCard />
+        </div>
       </SidebarHeader>
 
-      {/* Navigation */}
+      {/* Navigation (scrollable if it overflows) */}
       <SidebarContent>
         {/* Overview */}
         <SidebarGroup>
@@ -107,14 +128,14 @@ function AdminSidebar() {
 
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link
-                        to={item.url}
-                        className="flex w-full flex-row items-center gap-2"
-                      >
+                    <SidebarMenuButton
+                      render={<Link to={item.url} onClick={closeOnMobile} />}
+                      isActive={isActive}
+                    >
+                      <div className="flex w-full flex-row items-center gap-2">
                         <Icon className="size-4 shrink-0" />
                         <span className="truncate">{item.title}</span>
-                      </Link>
+                      </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -135,40 +156,14 @@ function AdminSidebar() {
 
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link
-                        to={item.url}
-                        className="flex w-full flex-row items-center gap-2"
-                      >
+                    <SidebarMenuButton
+                      render={<Link to={item.url} onClick={closeOnMobile} />}
+                      isActive={isActive}
+                    >
+                      <div className="flex w-full flex-row items-center gap-2">
                         <Icon className="size-4 shrink-0" />
                         <span className="truncate">{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Other / bottom section */}
-        <SidebarGroup className="mt-auto">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {otherItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.url;
-
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link
-                        to={item.url}
-                        className="flex w-full flex-row items-center gap-2"
-                      >
-                        <Icon className="size-4 shrink-0" />
-                        <span className="truncate">{item.title}</span>
-                      </Link>
+                      </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -177,6 +172,30 @@ function AdminSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Footer — always pinned and visible, independent of content scroll */}
+      <SidebarFooter>
+        <SidebarMenu>
+          {otherItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.url;
+
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  render={<Link to={item.url} onClick={closeOnMobile} />}
+                  isActive={isActive}
+                >
+                  <div className="flex w-full flex-row items-center gap-2">
+                    <Icon className="size-4 shrink-0" />
+                    <span className="truncate">{item.title}</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

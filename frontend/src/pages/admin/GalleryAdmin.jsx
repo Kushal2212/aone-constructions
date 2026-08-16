@@ -1,7 +1,10 @@
 import {
+  Check,
   Eye,
+  EyeOff,
   ImagePlus,
   Loader2,
+  Pencil,
   Search,
   Trash2,
   Upload,
@@ -13,6 +16,8 @@ import { toast } from "sonner";
 
 import {
   addGalleryImage,
+  updateGalleryImage,
+  toggleGalleryPublished,
   removeGalleryImage,
 } from "../../store/slices/gallerySlice";
 
@@ -35,6 +40,7 @@ import {
 } from "@/components/ui/dialog";
 
 const categories = ["all", "residential", "commercial", "road", "other"];
+const statusOptions = ["all", "published", "unpublished"];
 
 const MAX_FILE_SIZE_MB = 5;
 
@@ -45,8 +51,10 @@ function GalleryAdmin() {
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+  const [status, setStatus] = useState("all");
 
-  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingImage, setEditingImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
@@ -61,16 +69,30 @@ function GalleryAdmin() {
   });
 
   const filteredGallery = useMemo(() => {
-    return gallery.filter((item) => {
-      const matchesSearch = item.title
-        ?.toLowerCase()
-        .includes(search.toLowerCase());
+    return gallery
+      .filter((item) => {
+        const matchesSearch = item.title
+          ?.toLowerCase()
+          .includes(search.toLowerCase());
 
-      const matchesCategory = category === "all" || item.category === category;
+        const matchesCategory =
+          category === "all" || item.category === category;
 
-      return matchesSearch && matchesCategory;
-    });
-  }, [gallery, search, category]);
+        const matchesStatus =
+          status === "all" ||
+          (status === "published" && item.published) ||
+          (status === "unpublished" && !item.published);
+
+        return matchesSearch && matchesCategory && matchesStatus;
+      })
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }, [gallery, search, category, status]);
+
+  const counts = {
+    all: gallery.length,
+    published: gallery.filter((item) => item.published).length,
+    unpublished: gallery.filter((item) => !item.published).length,
+  };
 
   const resetForm = () => {
     setForm({
@@ -79,7 +101,24 @@ function GalleryAdmin() {
       imageUrl: "",
     });
     setSourceType("upload");
+    setEditingImage(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const openAddDialog = () => {
+    resetForm();
+    setDialogOpen(true);
+  };
+
+  const openEditDialog = (item) => {
+    setEditingImage(item);
+    setForm({
+      title: item.title,
+      category: item.category,
+      imageUrl: item.imageUrl,
+    });
+    setSourceType(item.imageUrl?.startsWith("data:") ? "upload" : "url");
+    setDialogOpen(true);
   };
 
   const handleFileSelect = (file) => {
@@ -101,7 +140,6 @@ function GalleryAdmin() {
       setForm((prev) => ({
         ...prev,
         imageUrl: reader.result,
-        // Prefill title from filename if it's still empty
         title:
           prev.title.trim() ||
           file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
@@ -115,7 +153,7 @@ function GalleryAdmin() {
     reader.readAsDataURL(file);
   };
 
-  const handleAddImage = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!form.title.trim()) {
@@ -134,19 +172,42 @@ function GalleryAdmin() {
 
     setIsSubmitting(true);
 
-    dispatch(
-      addGalleryImage({
-        title: form.title.trim(),
-        category: form.category,
-        imageUrl: form.imageUrl.trim(),
-      }),
-    );
+    if (editingImage) {
+      dispatch(
+        updateGalleryImage({
+          id: editingImage.id,
+          changes: {
+            title: form.title.trim(),
+            category: form.category,
+            imageUrl: form.imageUrl.trim(),
+          },
+        }),
+      );
 
-    toast.success("Gallery image added successfully.");
+      toast.success("Gallery image updated successfully.");
+    } else {
+      dispatch(
+        addGalleryImage({
+          title: form.title.trim(),
+          category: form.category,
+          imageUrl: form.imageUrl.trim(),
+        }),
+      );
+
+      toast.success("Gallery image added successfully.");
+    }
 
     setIsSubmitting(false);
     resetForm();
-    setShowAddDialog(false);
+    setDialogOpen(false);
+  };
+
+  const handleTogglePublished = (id) => {
+    dispatch(toggleGalleryPublished(id));
+
+    const item = gallery.find((entry) => entry.id === id);
+
+    toast.success(item?.published ? "Image unpublished" : "Image published");
   };
 
   const handleDelete = () => {
@@ -175,7 +236,7 @@ function GalleryAdmin() {
 
         <button
           type="button"
-          onClick={() => setShowAddDialog(true)}
+          onClick={openAddDialog}
           className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
         >
           <ImagePlus className="size-4" />
@@ -183,19 +244,31 @@ function GalleryAdmin() {
         </button>
       </div>
 
-      {/* Summary */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border bg-background p-5">
-          <p className="text-sm text-muted-foreground">Total Images</p>
+      {/* Summary cards */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <SummaryCard
+          label="Total"
+          value={counts.all}
+          icon={ImagePlus}
+          active={status === "all"}
+          onClick={() => setStatus("all")}
+        />
 
-          <p className="mt-2 text-3xl font-bold">{gallery.length}</p>
-        </div>
+        <SummaryCard
+          label="Published"
+          value={counts.published}
+          icon={Check}
+          active={status === "published"}
+          onClick={() => setStatus("published")}
+        />
 
-        <div className="rounded-2xl border bg-background p-5">
-          <p className="text-sm text-muted-foreground">Showing</p>
-
-          <p className="mt-2 text-3xl font-bold">{filteredGallery.length}</p>
-        </div>
+        <SummaryCard
+          label="Unpublished"
+          value={counts.unpublished}
+          icon={EyeOff}
+          active={status === "unpublished"}
+          onClick={() => setStatus("unpublished")}
+        />
       </div>
 
       {/* Filters */}
@@ -223,21 +296,23 @@ function GalleryAdmin() {
             </option>
           ))}
         </select>
+
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="h-10 rounded-xl border bg-background px-3 text-sm outline-none focus:border-primary"
+        >
+          {statusOptions.map((option) => (
+            <option key={option} value={option}>
+              {option === "all" ? "All Status" : capitalize(option)}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Gallery */}
       {filteredGallery.length === 0 ? (
-        <div className="rounded-2xl border bg-background py-20 text-center">
-          <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted">
-            <ImagePlus className="size-5 text-muted-foreground" />
-          </div>
-
-          <p className="mt-4 text-sm font-semibold">No gallery images found</p>
-
-          <p className="mt-1 text-sm text-muted-foreground">
-            Add an image or change your search/filter.
-          </p>
-        </div>
+        <EmptyState />
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredGallery.map((item) => (
@@ -263,34 +338,73 @@ function GalleryAdmin() {
                   >
                     <Eye className="size-4" />
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setDeleteId(item.id)}
-                    className="flex size-9 items-center justify-center rounded-full bg-white text-red-600 transition hover:scale-105"
-                    title="Delete"
-                  >
-                    <Trash2 className="size-4" />
-                  </button>
                 </div>
+
+                {/* Status badge */}
+                <span
+                  className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-medium backdrop-blur-md ${
+                    item.published
+                      ? "bg-green-500/90 text-white"
+                      : "bg-black/50 text-white"
+                  }`}
+                >
+                  {item.published ? "Published" : "Unpublished"}
+                </span>
               </div>
 
               {/* Content */}
               <div className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h3 className="truncate text-sm font-semibold">
-                      {item.title}
-                    </h3>
+                <div className="min-w-0">
+                  <h3 className="truncate text-sm font-semibold">
+                    {item.title}
+                  </h3>
 
-                    <p className="mt-1 text-xs capitalize text-muted-foreground">
-                      {item.category}
-                    </p>
-                  </div>
+                  <p className="mt-1 text-xs capitalize text-muted-foreground">
+                    {item.category}
+                  </p>
+                </div>
 
-                  <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
-                    {item.createdAt}
-                  </span>
+                {/* Actions */}
+                <div className="mt-4 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleTogglePublished(item.id)}
+                    className={`inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg border text-xs font-medium transition ${
+                      item.published
+                        ? "border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
+                        : "border-border bg-background text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {item.published ? (
+                      <>
+                        <Eye className="size-3.5" />
+                        Published
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff className="size-3.5" />
+                        Unpublished
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => openEditDialog(item)}
+                    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                    title="Edit image"
+                  >
+                    <Pencil className="size-4" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDeleteId(item.id)}
+                    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-red-50 hover:text-red-600"
+                    title="Delete image"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -298,20 +412,22 @@ function GalleryAdmin() {
         </div>
       )}
 
-      {/* Add Image Dialog */}
+      {/* Add / Edit Dialog */}
       <Dialog
-        open={showAddDialog}
+        open={dialogOpen}
         onOpenChange={(open) => {
-          setShowAddDialog(open);
+          setDialogOpen(open);
           if (!open) resetForm();
         }}
       >
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Add Gallery Image</DialogTitle>
+            <DialogTitle>
+              {editingImage ? "Edit Gallery Image" : "Add Gallery Image"}
+            </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddImage} className="space-y-5 pt-2">
+          <form onSubmit={handleSubmit} className="space-y-5 pt-2">
             {/* Source toggle */}
             <div className="flex rounded-xl border bg-muted/40 p-1">
               <button
@@ -427,7 +543,8 @@ function GalleryAdmin() {
                       type="button"
                       onClick={() => {
                         setForm({ ...form, imageUrl: "" });
-                        if (fileInputRef.current) fileInputRef.current.value = "";
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = "";
                       }}
                       className="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black/80"
                       title="Remove image"
@@ -469,7 +586,7 @@ function GalleryAdmin() {
             <div className="flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setShowAddDialog(false)}
+                onClick={() => setDialogOpen(false)}
                 className="h-10 rounded-xl border px-4 text-sm font-medium transition hover:bg-muted"
               >
                 Cancel
@@ -477,11 +594,13 @@ function GalleryAdmin() {
 
               <button
                 type="submit"
-                disabled={isSubmitting || !form.title.trim() || !form.imageUrl.trim()}
+                disabled={
+                  isSubmitting || !form.title.trim() || !form.imageUrl.trim()
+                }
                 className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting && <Loader2 className="size-4 animate-spin" />}
-                Add Image
+                {editingImage ? "Save Changes" : "Add Image"}
               </button>
             </div>
           </form>
@@ -540,13 +659,64 @@ function GalleryAdmin() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
   );
 }
+
+//Summary Card
+
+function SummaryCard({ label, value, icon: Icon, active, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group rounded-2xl border p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+        active ? "border-primary/30 bg-primary/[0.03]" : "bg-background"
+      }`}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+          <Icon className="size-5 text-primary" />
+        </div>
+
+        <span className="text-xs font-medium text-muted-foreground">View</span>
+      </div>
+
+      <p className="mt-5 text-sm text-muted-foreground">{label}</p>
+
+      <p className="mt-1 text-3xl font-bold tracking-tight">{value}</p>
+    </button>
+  );
+}
+
+// Empty State
+
+function EmptyState() {
+  return (
+    <div className="rounded-2xl border bg-background py-20 text-center">
+      <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted">
+        <ImagePlus className="size-5 text-muted-foreground" />
+      </div>
+
+      <p className="mt-4 text-sm font-semibold">No gallery images found</p>
+
+      <p className="mt-1 text-sm text-muted-foreground">
+        Try changing your search/filter or add a new image.
+      </p>
+    </div>
+  );
+}
+
+// Helpers
 
 function capitalize(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);

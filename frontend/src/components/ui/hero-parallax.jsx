@@ -2,41 +2,42 @@ import React, { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@base-ui/react";
 
 const projects = [
   {
     title: "Modern Residential Building",
     category: "Residential Construction",
     image:
-      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-01.avif",
     link: "/projects",
   },
   {
     title: "Contemporary House",
     category: "House Construction",
     image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-02.avif",
     link: "/projects",
   },
   {
     title: "Structural Development",
     category: "Structural Construction",
     image:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-03.avif",
     link: "/projects",
   },
   {
     title: "Commercial Building",
     category: "Building Construction",
     image:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-04.avif",
     link: "/projects",
   },
   {
     title: "Construction Planning",
     category: "Engineering & Planning",
     image:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-05.avif",
     link: "/projects",
   },
 
@@ -44,35 +45,35 @@ const projects = [
     title: "Site Development",
     category: "Site Supervision",
     image:
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-06.avif",
     link: "/projects",
   },
   {
     title: "Residential Project",
     category: "Residential Construction",
     image:
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-07.avif",
     link: "/projects",
   },
   {
     title: "Engineering Works",
     category: "Engineering Services",
     image:
-      "https://images.unsplash.com/photo-1531835551805-16d864c8d311?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-08.avif",
     link: "/projects",
   },
   {
     title: "Modern Construction",
     category: "Modern Technology",
     image:
-      "https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-09.avif",
     link: "/projects",
   },
   {
     title: "Building Development",
     category: "Construction",
     image:
-      "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-10.avif",
     link: "/projects",
   },
 
@@ -80,35 +81,36 @@ const projects = [
     title: "Site Execution",
     category: "Project Execution",
     image:
-      "https://images.unsplash.com/photo-1590479773265-7464e5d48118?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-11.avif",
     link: "/projects",
   },
+ 
   {
-    title: "Quality Construction",
-    category: "Construction",
-    image:
-      "https://images.unsplash.com/photo-1590725140246-20acddc1b7fe?auto=format&fit=crop&w=1200&q=85",
-    link: "/projects",
-  },
-  {
-    title: "Project Supervision",
+    title: "Project HandOver",
     category: "Site Supervision",
     image:
-      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200&q=85",
+      "/projects/photo-12.avif",
     link: "/projects",
   },
   {
-    title: "Future Ready Construction",
-    category: "Modern Construction",
+    title: "Hydro Power",
+    category: "Site Supervision",
     image:
-      "https://images.unsplash.com/photo-1590644365607-1c5a2e9b5d4a?auto=format&fit=crop&w=1200&q=85",
+      "/projects/project-01.jpg",
     link: "/projects",
   },
   {
-    title: "Complete Building Solution",
-    category: "Construction & Engineering",
+    title: "Project Madi",
+    category: "Site Supervision",
     image:
-      "https://images.unsplash.com/photo-1508450859948-4e04fabaa4c6?auto=format&fit=crop&w=1200&q=85",
+      "/projects/project-02.jpg",
+    link: "/projects",
+  },
+  {
+    title: "Project End",
+    category: "Site Supervision",
+    image:
+      "/projects/project-03.jpg",
     link: "/projects",
   },
 ];
@@ -165,14 +167,16 @@ function HeroParallax({ products = projects }) {
     <section
       ref={ref}
       className="
-        relative flex h-[260vh] flex-col
-        overflow-hidden
-        bg-background
-        py-20
-        antialiased
-        [perspective:1000px]
-        [transform-style:preserve-3d]
-      "
+    relative flex flex-col
+    overflow-hidden
+    bg-background
+    py-12
+    antialiased
+    lg:h-[260vh]
+    lg:py-20
+    lg:[perspective:1000px]
+    lg:[transform-style:preserve-3d]
+  "
     >
       <HeroHeader />
 
@@ -285,7 +289,7 @@ function HeroHeader() {
           className="
             mx-auto mt-6 max-w-2xl
             text-base leading-7
-            text-muted-foreground
+            text-slate-700
             sm:text-lg
           "
         >
@@ -295,47 +299,54 @@ function HeroHeader() {
         </p>
 
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            to="/contact"
-            className="
-              group inline-flex h-12
-              items-center justify-center
-              gap-2 rounded-full
-              bg-slate-950
-              px-6
-              text-sm font-semibold text-white
-              transition-all duration-300
-              hover:bg-slate-800
-            "
+          <Button
+            nativeButton={false}
+            size="lg"
+            render={<Link to="/contact"/>}
+            className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition-all duration-300 hover:bg-transparent hover:shadow-lg hover:shadow-slate-900/20"
           >
-            Start a Project
-            <ArrowUpRight
-              className="
-                size-4
-                transition-transform duration-300
-                group-hover:-translate-y-0.5
-                group-hover:translate-x-0.5
-              "
-            />
-          </Link>
+              <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2 hover:text-slate-900">
+                Start a Project
+              </span>
 
-          <Link
-            to="/projects"
-            className="
-              inline-flex h-12
-              items-center justify-center
-              rounded-full
-              border border-slate-300
-              px-6
-              text-sm font-semibold
-              text-slate-900
-              transition-all duration-300
-              hover:border-slate-400
-              hover:bg-slate-50
-            "
+              <ArrowUpRight
+                className="
+                    absolute right-4 top-1/2 size-4 -translate-y-1/2
+                    text-primary opacity-70
+                    transition-all duration-300 ease-out
+                    group-hover:right-3.5
+                    group-hover:translate-x-0.5
+                    group-hover:opacity-100
+                    group-hover:text-slate-900
+                  "
+              />
+            
+          </Button>
+
+          {/* Secondary CTA — same sliding-text pattern, outline style */}
+          <Button
+            nativeButton={false}
+            size="lg"
+            render={<Link to="/contact"/>}
+            className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-white px-5 text-sm font-semibold text-primary transition-all duration-300 hover:bg-transparent hover:shadow-lg hover:shadow-slate-900/20"
           >
-            View Our Projects
-          </Link>
+              <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
+                Start a Project
+              </span>
+
+              <ArrowUpRight
+                className="
+                      absolute right-4 top-1/2 size-4 -translate-y-1/2
+                      text-primary opacity-70
+                      transition-all duration-300 ease-out
+                      group-hover:right-3.5
+                      group-hover:translate-x-0.5
+                      group-hover:opacity-100
+                      group-hover:text-slate-900
+                    "
+              />
+            
+          </Button>
         </div>
       </div>
     </div>
