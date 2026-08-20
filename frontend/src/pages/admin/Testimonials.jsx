@@ -9,7 +9,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
@@ -409,23 +409,27 @@ function TestimonialDialog({ open, onOpenChange, testimonial }) {
 
   const isEditing = Boolean(testimonial);
 
-  const handleOpenChange = (value) => {
-    if (value && testimonial) {
+  // Populate (or reset) the form whenever the dialog opens, or the
+  // testimonial being edited changes. This runs regardless of *how*
+  // `open` became true (parent-triggered or dialog-internal), unlike
+  // relying on onOpenChange, which only fires for dialog-internal changes
+  // (e.g. Escape key, overlay click) — not when a parent sets `open`
+  // directly, which is exactly what happens when clicking "Edit".
+  useEffect(() => {
+    if (!open) return;
+
+    if (testimonial) {
       setClientName(testimonial.clientName || "");
       setRole(testimonial.role || "");
       setMessage(testimonial.message || "");
       setRating(testimonial.rating || 5);
-    }
-
-    if (value && !testimonial) {
+    } else {
       setClientName("");
       setRole("");
       setMessage("");
       setRating(5);
     }
-
-    onOpenChange(value);
-  };
+  }, [open, testimonial]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -476,7 +480,7 @@ function TestimonialDialog({ open, onOpenChange, testimonial }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>

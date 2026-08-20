@@ -1,8 +1,12 @@
-import { Quote, Star } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useState } from "react";
+import { Quote, Star, Loader2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "@base-ui/react";
+import { toast } from "sonner";
+
+import { addTestimonial } from "../../src/store/slices/testimonialsSlice";
 
 function Testimonials() {
   const testimonials = useSelector((state) => state.testimonials.items);
@@ -53,6 +57,13 @@ function Testimonials() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Share Your Experience */}
+      <section className="border-b bg-background py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <ShareExperienceForm />
         </div>
       </section>
 
@@ -181,6 +192,173 @@ function EmptyTestimonials() {
         to see what they have to say about working with A.one Brain
         Construction.
       </p>
+    </div>
+  );
+}
+
+// Share Your Experience — visitor submission form
+function ShareExperienceForm() {
+  const dispatch = useDispatch();
+
+  const [clientName, setClientName] = useState("");
+  const [role, setRole] = useState("");
+  const [message, setMessage] = useState("");
+  const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!clientName.trim()) {
+      toast.error("Please enter your name.");
+      return;
+    }
+
+    if (!role.trim()) {
+      toast.error("Please enter your role, e.g. Homeowner.");
+      return;
+    }
+
+    if (!message.trim()) {
+      toast.error("Please share a few words about your experience.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    dispatch(
+      addTestimonial({
+        clientName: clientName.trim(),
+        role: role.trim(),
+        message: message.trim(),
+        rating,
+      }),
+    );
+
+    toast.success("Thank you! Your testimonial has been submitted for review.");
+
+    setClientName("");
+    setRole("");
+    setMessage("");
+    setRating(5);
+    setIsSubmitting(false);
+    setSubmitted(true);
+  };
+
+  return (
+    <div className="mx-auto max-w-2xl rounded-3xl border bg-muted/30 p-8 sm:p-10 lg:p-12">
+      <div className="text-center">
+        <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-primary/10">
+          <Quote className="size-5 text-primary" />
+        </div>
+
+        <h2 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
+          Share your experience
+        </h2>
+
+        <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
+          Worked with us on a project? We would love to hear about it. Your
+          testimonial will be reviewed before it appears on this page.
+        </p>
+      </div>
+
+      {submitted ? (
+        <div className="mt-8 rounded-2xl border bg-background p-6 text-center">
+          <p className="text-sm font-semibold">Thank you for your feedback!</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Your testimonial is pending review and will appear here once
+            approved.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setSubmitted(false)}
+            className="mt-4 text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Submit another testimonial
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Your Name</label>
+
+              <input
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder="e.g. Ram Sharma"
+                className="h-10 w-full rounded-xl border bg-background px-3 text-sm outline-none transition focus:border-primary"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Role / Company</label>
+
+              <input
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                placeholder="e.g. Homeowner"
+                className="h-10 w-full rounded-xl border bg-background px-3 text-sm outline-none transition focus:border-primary"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Your Testimonial</label>
+
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Tell us about your experience working with us..."
+              rows={5}
+              className="w-full resize-none rounded-xl border bg-background p-3 text-sm leading-6 outline-none transition focus:border-primary"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Rating</label>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, index) => {
+                const starValue = index + 1;
+                const isFilled = starValue <= (hoverRating || rating);
+
+                return (
+                  <button
+                    key={starValue}
+                    type="button"
+                    onClick={() => setRating(starValue)}
+                    onMouseEnter={() => setHoverRating(starValue)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    className="rounded-md p-1 transition hover:bg-muted"
+                    aria-label={`Rate ${starValue} out of 5`}
+                  >
+                    <Star
+                      className={`size-6 ${
+                        isFilled
+                          ? "fill-current text-yellow-500"
+                          : "text-muted-foreground/30"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition-all duration-300 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          >
+            {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+            Submit Testimonial
+          </button>
+        </form>
+      )}
     </div>
   );
 }

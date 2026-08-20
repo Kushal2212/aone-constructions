@@ -5,15 +5,17 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./App.jsx";
 import store from "./store";
-
+import { ThemeProvider } from "./components/context/ThemeProvider.jsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </Provider>
+    <ThemeProvider defaultTheme="system">
+      <Provider store={store}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </Provider>
+    </ThemeProvider>
   </StrictMode>,
 );

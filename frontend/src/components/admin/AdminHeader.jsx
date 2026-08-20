@@ -1,6 +1,7 @@
 import { Bell } from "lucide-react";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import ThemeToggle from "@/components/ThemeToggle";
 
 
 function AdminHeader() {
@@ -20,15 +21,19 @@ function AdminHeader() {
         
       </div>
 
-      <button
-        type="button"
-        aria-label="Notifications"
-        className="relative flex size-9 items-center justify-center rounded-full border transition-colors hover:bg-muted"
-      >
-        <Bell className="size-4" />
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
 
-        <span className="absolute right-2 top-2 size-1.5 rounded-full bg-primary" />
-      </button>
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="relative flex size-9 items-center justify-center rounded-full border transition-colors hover:bg-muted"
+        >
+          <Bell className="size-4" />
+
+          <span className="absolute right-2 top-2 size-1.5 rounded-full bg-primary" />
+        </button>
+      </div>
     </header>
   );
 }
