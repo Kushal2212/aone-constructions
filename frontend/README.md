@@ -1,16 +1,17 @@
-# React + Vite
+# A.one Construction frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## Local development
 
-Currently, two official plugins are available:
+1. Start the backend by following [the backend setup guide](../backend/README.md).
+2. In `frontend`, install dependencies and start Vite:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+   ```sh
+   npm install
+   npm run dev
+   ```
 
-## React Compiler
+Vite proxies `/api` requests to `http://localhost:5000` by default, so the browser uses the backend without a separate CORS setup in development. To use a different local API host, set `VITE_API_PROXY_TARGET` before starting Vite.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Copy `.env.example` to `.env.local` if you want to set `VITE_API_URL`. Keep `/api` for local development; for deployment, set it to the full backend API URL, such as `https://api.example.com/api`. The backend's `CLIENT_ORIGIN` must include the deployed frontend origin.
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+The admin login uses the account bootstrapped by the backend from `ADMIN_EMAIL` and `ADMIN_PASSWORD`. Project and gallery file uploads require Cloudinary credentials in the backend environment.

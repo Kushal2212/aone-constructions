@@ -14,12 +14,9 @@ import { useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
-import {
-  addGalleryImage,
-  updateGalleryImage,
-  toggleGalleryPublished,
-  removeGalleryImage,
-} from "../../store/slices/gallerySlice";
+import { apiRequest, uploadMedia } from "@/services/api";
+import { loadGallery } from "@/services/dataApi";
+import { setGalleryItems } from "../../store/slices/gallerySlice";
 
 import {
   AlertDialog,
@@ -60,6 +57,7 @@ function GalleryAdmin() {
 
   const [sourceType, setSourceType] = useState("upload"); // "upload" | "url"
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
@@ -101,6 +99,7 @@ function GalleryAdmin() {
       imageUrl: "",
     });
     setSourceType("upload");
+    setSelectedFile(null);
     setEditingImage(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -122,19 +121,25 @@ function GalleryAdmin() {
   };
 
   const handleFileSelect = (file) => {
-    if (!file) return;
+    if (!file) {
+      setSelectedFile(null);
+      return;
+    }
 
     if (!file.type.startsWith("image/")) {
+      setSelectedFile(null);
       toast.error("Please select an image file.");
       return;
     }
 
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setSelectedFile(null);
       toast.error(`Image must be smaller than ${MAX_FILE_SIZE_MB}MB.`);
       return;
     }
 
     const reader = new FileReader();
+    setSelectedFile(file);
 
     reader.onload = () => {
       setForm((prev) => ({
@@ -153,7 +158,7 @@ function GalleryAdmin() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.title.trim()) {
@@ -161,7 +166,7 @@ function GalleryAdmin() {
       return;
     }
 
-    if (!form.imageUrl.trim()) {
+    if (!selectedFile && !form.imageUrl.trim()) {
       toast.error(
         sourceType === "upload"
           ? "Please choose an image to upload."
@@ -171,53 +176,53 @@ function GalleryAdmin() {
     }
 
     setIsSubmitting(true);
-
-    if (editingImage) {
-      dispatch(
-        updateGalleryImage({
-          id: editingImage.id,
-          changes: {
-            title: form.title.trim(),
-            category: form.category,
-            imageUrl: form.imageUrl.trim(),
-          },
-        }),
-      );
-
-      toast.success("Gallery image updated successfully.");
-    } else {
-      dispatch(
-        addGalleryImage({
-          title: form.title.trim(),
-          category: form.category,
-          imageUrl: form.imageUrl.trim(),
-        }),
-      );
-
-      toast.success("Gallery image added successfully.");
+    try {
+      const media = selectedFile ? await uploadMedia(selectedFile, "gallery") : undefined;
+      const payload = {
+        title: form.title.trim(),
+        category: form.category,
+        imageUrl: media?.url || form.imageUrl.trim(),
+        ...(!editingImage ? { published: true } : {}),
+        ...(media ? { media } : {}),
+      };
+      if (editingImage) {
+        await apiRequest(`/admin/gallery/${editingImage.id}`, { method: "PATCH", body: payload });
+      } else {
+        await apiRequest("/admin/gallery", { method: "POST", body: payload });
+      }
+      dispatch(setGalleryItems(await loadGallery(true)));
+      toast.success(editingImage ? "Gallery image updated successfully." : "Gallery image added successfully.");
+      resetForm();
+      setDialogOpen(false);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    resetForm();
-    setDialogOpen(false);
   };
 
-  const handleTogglePublished = (id) => {
-    dispatch(toggleGalleryPublished(id));
-
+  const handleTogglePublished = async (id) => {
     const item = gallery.find((entry) => entry.id === id);
-
-    toast.success(item?.published ? "Image unpublished" : "Image published");
+    if (!item) return;
+    try {
+      await apiRequest(`/admin/gallery/${id}`, { method: "PATCH", body: { published: !item.published } });
+      dispatch(setGalleryItems(await loadGallery(true)));
+      toast.success(item.published ? "Image unpublished" : "Image published");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteId) return;
-
-    dispatch(removeGalleryImage(deleteId));
-
-    toast.success("Gallery image deleted successfully.");
-
-    setDeleteId(null);
+    try {
+      await apiRequest(`/admin/gallery/${deleteId}`, { method: "DELETE" });
+      dispatch(setGalleryItems(await loadGallery(true)));
+      toast.success("Gallery image deleted successfully.");
+      setDeleteId(null);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -444,7 +449,12 @@ function GalleryAdmin() {
 
               <button
                 type="button"
-                onClick={() => setSourceType("url")}
+                onClick={() => {
+                  setSourceType("url");
+                  if (selectedFile) setForm((current) => ({ ...current, imageUrl: "" }));
+                  setSelectedFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
                 className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${
                   sourceType === "url"
                     ? "bg-background shadow-sm"

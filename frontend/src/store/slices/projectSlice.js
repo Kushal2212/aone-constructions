@@ -19,6 +19,9 @@ const projectSlice = createSlice({
   name: "projects",
   initialState,
   reducers: {
+    setProjects(state, action) {
+      state.items = action.payload;
+    },
     addProjectImage: {
       reducer(state, action) {
         state.items.unshift(action.payload);
@@ -54,6 +57,7 @@ const projectSlice = createSlice({
 });
 
 export const {
+  setProjects,
   addProjectImage,
   updateProject,
   toggleProjectPublished,

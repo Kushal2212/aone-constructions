@@ -21,13 +21,12 @@ import {
 
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  deleteEnquiry,
-  setEnquiryStatus,
-} from "../../store/slices/enquiriesSlice";
 import { toast } from "sonner";
+import { apiRequest } from "@/services/api";
+import { loadEnquiries } from "@/services/dataApi";
+import { setEnquiries } from "@/store/slices/enquiriesSlice";
 
-const statusOptions = ["all", "new", "contacted", "converted"];
+const statusOptions = ["all", "new", "contacted", "converted", "closed"];
 
 function Enquiries() {
   const dispatch = useDispatch();
@@ -61,15 +60,14 @@ function Enquiries() {
     converted: enquiries.filter((item) => item.status === "converted").length,
   };
 
-  const handleStatusChange = (id, newStatus) => {
-    dispatch(
-      setEnquiryStatus({
-        id,
-        status: newStatus,
-      }),
-    );
-
-    toast.success(`Enquiry marked as ${newStatus}`);
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await apiRequest(`/admin/enquiries/${id}`, { method: "PATCH", body: { status: newStatus } });
+      dispatch(setEnquiries(await loadEnquiries()));
+      toast.success(`Enquiry marked as ${newStatus}`);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -315,10 +313,13 @@ function Enquiries() {
 
             <AlertDialogAction
               onClick={() => {
-                dispatch(deleteEnquiry(deleteId));
-                setDeleteId(null);
-
-                toast.success("Enquiry deleted successfully");
+                apiRequest(`/admin/enquiries/${deleteId}`, { method: "DELETE" })
+                  .then(async () => {
+                    dispatch(setEnquiries(await loadEnquiries()));
+                    setDeleteId(null);
+                    toast.success("Enquiry deleted successfully");
+                  })
+                  .catch((error) => toast.error(error.message));
               }}
             >
               Delete

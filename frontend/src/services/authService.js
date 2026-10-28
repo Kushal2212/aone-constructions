@@ -1,44 +1,35 @@
-// replace the body of login() with an API call (POST /api/auth/login)
+import {
+  apiRequest,
+  clearStoredSession,
+  getStoredSession,
+  storeSession,
+} from "./api";
 
-const SESSION_KEY = "aone_construction_admin_session";
-
-// replace with real credential check against a backend.
-const MOCK_ADMIN = {
-  email: "admin@gmail.com",
-  password: "Admin123",
-  name: "Administrator",
-};
+export { getStoredSession } from "./api";
 
 export function login({ email, password }) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (
-        email === MOCK_ADMIN.email &&
-        password === MOCK_ADMIN.password
-      ) {
-        const session = {
-          email: MOCK_ADMIN.email,
-          name: MOCK_ADMIN.name,
-          token: `mock-token-${Date.now()}`,
-        };
-        window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-        resolve(session);
-      } else {
-        reject(new Error("Incorrect email or password."));
-      }
-    }, 350);
-  });
+  return apiRequest("/auth/login", { method: "POST", body: { email, password } })
+    .then(({ admin, token }) => {
+      const session = { ...admin, token };
+      storeSession(session);
+      return session;
+    });
 }
 
 export function logout() {
-  window.localStorage.removeItem(SESSION_KEY);
+  clearStoredSession();
 }
 
-export function getStoredSession() {
+export async function validateSession() {
+  const session = getStoredSession();
+  if (!session?.token) return null;
   try {
-    const raw = window.localStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
+    const { admin } = await apiRequest("/auth/me");
+    const updatedSession = { ...admin, token: session.token };
+    storeSession(updatedSession);
+    return updatedSession;
+  } catch (error) {
+    if (error.status === 401) logout();
+    throw error;
   }
 }

@@ -41,6 +41,9 @@ const settingsSlice = createSlice({
   name: "settings",
   initialState: loadSettings(),
   reducers: {
+    setSettings(state, action) {
+      Object.assign(state, action.payload);
+    },
     updateCompany(state, action) {
       state.company = { ...state.company, ...action.payload };
       persist(state);
@@ -61,6 +64,6 @@ const settingsSlice = createSlice({
   },
 });
 
-export const { updateCompany, updateSocial, updateAdmin, toggleNotification } =
+export const { setSettings, updateCompany, updateSocial, updateAdmin, toggleNotification } =
   settingsSlice.actions;
 export default settingsSlice.reducer;

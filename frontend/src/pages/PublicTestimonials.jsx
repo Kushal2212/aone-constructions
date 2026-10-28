@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Quote, Star, Loader2 } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "@base-ui/react";
 import { toast } from "sonner";
-
-import { addTestimonial } from "../../src/store/slices/testimonialsSlice";
+import { apiRequest } from "@/services/api";
 
 function Testimonials() {
   const testimonials = useSelector((state) => state.testimonials.items);
@@ -198,8 +197,6 @@ function EmptyTestimonials() {
 
 // Share Your Experience — visitor submission form
 function ShareExperienceForm() {
-  const dispatch = useDispatch();
-
   const [clientName, setClientName] = useState("");
   const [role, setRole] = useState("");
   const [message, setMessage] = useState("");
@@ -208,7 +205,7 @@ function ShareExperienceForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!clientName.trim()) {
@@ -228,23 +225,29 @@ function ShareExperienceForm() {
 
     setIsSubmitting(true);
 
-    dispatch(
-      addTestimonial({
+    try {
+      await apiRequest("/testimonials", {
+        method: "POST",
+        body: {
         clientName: clientName.trim(),
         role: role.trim(),
         message: message.trim(),
         rating,
-      }),
-    );
+        },
+      });
 
-    toast.success("Thank you! Your testimonial has been submitted for review.");
+      toast.success("Thank you! Your testimonial has been submitted for review.");
 
-    setClientName("");
-    setRole("");
-    setMessage("");
-    setRating(5);
-    setIsSubmitting(false);
-    setSubmitted(true);
+      setClientName("");
+      setRole("");
+      setMessage("");
+      setRating(5);
+      setSubmitted(true);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

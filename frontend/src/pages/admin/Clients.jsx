@@ -2,7 +2,6 @@ import {
   Check,
   Edit,
   Eye,
-  Mail,
   MapPin,
   Phone,
   Plus,
@@ -26,11 +25,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import {
-  addClient,
-  deleteClient,
-  updateClient,
-} from "../../store/slices/clientSlice";
+import { apiRequest } from "@/services/api";
+import { loadClients } from "@/services/dataApi";
+import { setClients } from "../../store/slices/clientSlice";
 
 const statusOptions = ["all", "lead", "active", "completed"];
 
@@ -75,18 +72,17 @@ function Clients() {
     completed: clients.filter((client) => client.status === "completed").length,
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteId) return;
-
-    dispatch(deleteClient(deleteId));
-
-    if (selectedClient?.id === deleteId) {
-      setSelectedClient(null);
+    try {
+      await apiRequest(`/admin/clients/${deleteId}`, { method: "DELETE" });
+      dispatch(setClients(await loadClients()));
+      if (selectedClient?.id === deleteId) setSelectedClient(null);
+      setDeleteId(null);
+      toast.success("Client deleted successfully");
+    } catch (error) {
+      toast.error(error.message);
     }
-
-    setDeleteId(null);
-
-    toast.success("Client deleted successfully");
   };
 
   const handleEdit = (client) => {
@@ -94,24 +90,20 @@ function Clients() {
     setShowForm(true);
   };
 
-  const handleFormSubmit = (formData) => {
-    if (editingClient) {
-      dispatch(
-        updateClient({
-          id: editingClient.id,
-          changes: formData,
-        }),
-      );
-
-      toast.success("Client updated successfully");
-    } else {
-      dispatch(addClient(formData));
-
-      toast.success("Client added successfully");
+  const handleFormSubmit = async (formData) => {
+    try {
+      if (editingClient) {
+        await apiRequest(`/admin/clients/${editingClient.id}`, { method: "PATCH", body: formData });
+      } else {
+        await apiRequest("/admin/clients", { method: "POST", body: formData });
+      }
+      dispatch(setClients(await loadClients()));
+      toast.success(editingClient ? "Client updated successfully" : "Client added successfully");
+      setShowForm(false);
+      setEditingClient(null);
+    } catch (error) {
+      toast.error(error.message);
     }
-
-    setShowForm(false);
-    setEditingClient(null);
   };
 
   return (

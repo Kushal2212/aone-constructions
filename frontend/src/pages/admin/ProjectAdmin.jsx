@@ -14,12 +14,9 @@ import { useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
-import {
-  addProjectImage,
-  updateProject,
-  toggleProjectPublished,
-  removeProject,
-} from "../../store/slices/projectSlice";
+import { apiRequest, uploadMedia } from "@/services/api";
+import { loadProjects } from "@/services/dataApi";
+import { setProjects } from "@/store/slices/projectSlice";
 
 import {
   AlertDialog,
@@ -60,6 +57,7 @@ function ProjectAdmin() {
 
   const [sourceType, setSourceType] = useState("upload"); // "upload" | "url"
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
@@ -105,6 +103,7 @@ function ProjectAdmin() {
       imageUrl: "",
     });
     setSourceType("upload");
+    setSelectedFile(null);
     setEditingProject(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -128,19 +127,25 @@ function ProjectAdmin() {
   };
 
   const handleFileSelect = (file) => {
-    if (!file) return;
+    if (!file) {
+      setSelectedFile(null);
+      return;
+    }
 
     if (!file.type.startsWith("image/")) {
+      setSelectedFile(null);
       toast.error("Please select an image file.");
       return;
     }
 
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setSelectedFile(null);
       toast.error(`Image must be smaller than ${MAX_FILE_SIZE_MB}MB.`);
       return;
     }
 
     const reader = new FileReader();
+    setSelectedFile(file);
 
     reader.onload = () => {
       setForm((prev) => ({
@@ -159,7 +164,7 @@ function ProjectAdmin() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.title.trim()) {
@@ -167,7 +172,7 @@ function ProjectAdmin() {
       return;
     }
 
-    if (!form.imageUrl.trim()) {
+    if (!selectedFile && !form.imageUrl.trim()) {
       toast.error(
         sourceType === "upload"
           ? "Please choose an image to upload."
@@ -177,59 +182,55 @@ function ProjectAdmin() {
     }
 
     setIsSubmitting(true);
-
-    if (editingProject) {
-      dispatch(
-        updateProject({
-          id: editingProject.id,
-          changes: {
-            title: form.title.trim(),
-            category: form.category,
-            description: form.description.trim(),
-            location: form.location.trim(),
-            imageUrl: form.imageUrl.trim(),
-          },
-        }),
-      );
-
-      toast.success("Project updated successfully.");
-    } else {
-      dispatch(
-        addProjectImage({
-          title: form.title.trim(),
-          category: form.category,
-          description: form.description.trim(),
-          location: form.location.trim(),
-          imageUrl: form.imageUrl.trim(),
-        }),
-      );
-
-      toast.success("Project added successfully.");
+    try {
+      const media = selectedFile ? await uploadMedia(selectedFile, "projects") : undefined;
+      const payload = {
+        title: form.title.trim(),
+        category: form.category,
+        description: form.description.trim(),
+        location: form.location.trim(),
+        imageUrl: media?.url || form.imageUrl.trim(),
+        ...(!editingProject ? { published: true } : {}),
+        ...(media ? { media: [media] } : {}),
+      };
+      if (editingProject) {
+        await apiRequest(`/admin/projects/${editingProject.id}`, { method: "PATCH", body: payload });
+      } else {
+        await apiRequest("/admin/projects", { method: "POST", body: payload });
+      }
+      dispatch(setProjects(await loadProjects(true)));
+      toast.success(editingProject ? "Project updated successfully." : "Project added successfully.");
+      resetForm();
+      setDialogOpen(false);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    resetForm();
-    setDialogOpen(false);
   };
 
-  const handleTogglePublished = (id) => {
-    dispatch(toggleProjectPublished(id));
-
+  const handleTogglePublished = async (id) => {
     const item = projects.find((entry) => entry.id === id);
-
-    toast.success(
-      item?.published ? "Project unpublished" : "Project published",
-    );
+    if (!item) return;
+    try {
+      await apiRequest(`/admin/projects/${id}`, { method: "PATCH", body: { published: !item.published } });
+      dispatch(setProjects(await loadProjects(true)));
+      toast.success(item.published ? "Project unpublished" : "Project published");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteId) return;
-
-    dispatch(removeProject(deleteId));
-
-    toast.success("Project deleted successfully.");
-
-    setDeleteId(null);
+    try {
+      await apiRequest(`/admin/projects/${deleteId}`, { method: "DELETE" });
+      dispatch(setProjects(await loadProjects(true)));
+      toast.success("Project deleted successfully.");
+      setDeleteId(null);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -471,7 +472,12 @@ function ProjectAdmin() {
 
               <button
                 type="button"
-                onClick={() => setSourceType("url")}
+                onClick={() => {
+                  setSourceType("url");
+                  if (selectedFile) setForm((current) => ({ ...current, imageUrl: "" }));
+                  setSelectedFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
                 className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${
                   sourceType === "url"
                     ? "bg-background shadow-sm"

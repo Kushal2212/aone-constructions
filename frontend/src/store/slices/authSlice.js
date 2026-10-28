@@ -4,9 +4,9 @@ import * as authService from "../../services/authService";
 const storedSession = authService.getStoredSession();
 
 const initialState = {
-  isAuthenticated: Boolean(storedSession),
+  isAuthenticated: Boolean(storedSession?.token),
   admin: storedSession || null,
-  status: "idle", // idle | loading | failed
+  status: storedSession?.token ? "checking" : "idle",
   error: null,
 };
 
@@ -22,10 +22,24 @@ export const loginAdmin = createAsyncThunk(
   },
 );
 
+export const validateAdminSession = createAsyncThunk(
+  "auth/validateSession",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await authService.validateSession();
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    updateAdminIdentity(state, action) {
+      state.admin = { ...state.admin, ...action.payload };
+    },
     logoutAdmin(state) {
       authService.logout();
       state.isAuthenticated = false;
@@ -51,9 +65,23 @@ const authSlice = createSlice({
       .addCase(loginAdmin.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Login failed.";
+      })
+      .addCase(validateAdminSession.pending, (state) => {
+        state.status = "checking";
+      })
+      .addCase(validateAdminSession.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.isAuthenticated = Boolean(action.payload);
+        state.admin = action.payload;
+      })
+      .addCase(validateAdminSession.rejected, (state) => {
+        state.status = "idle";
+        const session = authService.getStoredSession();
+        state.isAuthenticated = Boolean(session?.token);
+        state.admin = session;
       });
   },
 });
 
-export const { logoutAdmin, clearAuthError } = authSlice.actions;
+export const { logoutAdmin, clearAuthError, updateAdminIdentity } = authSlice.actions;
 export default authSlice.reducer;

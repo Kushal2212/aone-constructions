@@ -1,13 +1,17 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ArrowUpRight, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/services/api";
+import { toast } from "sonner";
 
 function ContactForm() {
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm({
     defaultValues: {
@@ -17,18 +21,20 @@ function ContactForm() {
       message: "",
     },
   });
+  const [submitError, setSubmitError] = useState("");
 
   async function onSubmit(data) {
-    // Temporary API simulation.
-    // Later this becomes:
-    // await api.post("/api/enquiries", data);
-
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    console.log("Enquiry:", data);
+    try {
+      await apiRequest("/enquiries", { method: "POST", body: data });
+      setSubmitError("");
+    } catch (error) {
+      setSubmitError(error.message);
+      setError("root.server", { message: error.message });
+      toast.error(error.message);
+    }
   }
 
-  if (isSubmitSuccessful) {
+  if (isSubmitSuccessful && !submitError) {
     return (
       <div className="flex min-h-[420px] flex-col items-center justify-center rounded-3xl border bg-background p-8 text-center sm:p-12">
         <div className="flex size-14 items-center justify-center rounded-full bg-primary/10">
@@ -229,6 +235,11 @@ function ContactForm() {
       <p className="mt-4 text-xs leading-5 text-muted-foreground">
         Your information will only be used to respond to your enquiry.
       </p>
+      {errors.root?.server && (
+        <p role="alert" className="mt-3 text-sm text-destructive">
+          {errors.root.server.message}
+        </p>
+      )}
     </form>
   );
 }

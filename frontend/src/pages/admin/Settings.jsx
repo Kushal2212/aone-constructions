@@ -9,16 +9,13 @@ import {
   Bell,
   Settings as SettingsIcon,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
-import {
-  updateCompany,
-  updateSocial,
-  updateAdmin,
-  toggleNotification,
-} from "@/store/slices/settingsSlice";
+import { apiRequest, getStoredSession, storeSession } from "@/services/api";
+import { setSettings } from "@/store/slices/settingsSlice";
+import { updateAdminIdentity } from "@/store/slices/authSlice";
 
 const sidebarItems = [
   { key: "general", label: "General", icon: SettingsIcon },
@@ -39,6 +36,12 @@ function Settings() {
   const [adminDraft, setAdminDraft] = useState(admin);
 
   const [activeSection, setActiveSection] = useState("general");
+
+  useEffect(() => {
+    setCompanyDraft(company);
+    setSocialDraft(social);
+    setAdminDraft(admin);
+  }, [company, social, admin]);
 
   const sectionRefs = {
     general: useRef(null),
@@ -69,27 +72,53 @@ function Settings() {
     setAdminDraft((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCompanySave = (e) => {
+  const handleCompanySave = async (e) => {
     e.preventDefault();
-    dispatch(updateCompany(companyDraft));
-    toast.success("Company information saved successfully");
+    try {
+      const { item } = await apiRequest("/admin/settings", { method: "PATCH", body: { company: companyDraft } });
+      dispatch(setSettings(item));
+      toast.success("Company information saved successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
-  const handleSocialSave = (e) => {
+  const handleSocialSave = async (e) => {
     e.preventDefault();
-    dispatch(updateSocial(socialDraft));
-    toast.success("Social links saved successfully");
+    try {
+      const { item } = await apiRequest("/admin/settings", { method: "PATCH", body: { social: socialDraft } });
+      dispatch(setSettings(item));
+      toast.success("Social links saved successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
-  const handleAdminSave = (e) => {
+  const handleAdminSave = async (e) => {
     e.preventDefault();
-    dispatch(updateAdmin(adminDraft));
-    toast.success("Admin profile saved successfully");
+    try {
+      const { admin: updatedAdmin } = await apiRequest("/auth/me", {
+        method: "PATCH",
+        body: { name: adminDraft.name, email: adminDraft.email },
+      });
+      storeSession({ ...getStoredSession(), ...updatedAdmin });
+      dispatch(updateAdminIdentity(updatedAdmin));
+      dispatch(setSettings({ admin: updatedAdmin }));
+      toast.success("Admin profile saved successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
-  const handleNotificationChange = (key) => {
-    dispatch(toggleNotification(key));
-    toast.success("Notification preference updated");
+  const handleNotificationChange = async (key) => {
+    const updated = { ...notifications, [key]: !notifications[key] };
+    try {
+      const { item } = await apiRequest("/admin/settings", { method: "PATCH", body: { notifications: updated } });
+      dispatch(setSettings(item));
+      toast.success("Notification preference updated");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (

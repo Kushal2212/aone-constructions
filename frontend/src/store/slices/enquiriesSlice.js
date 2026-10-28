@@ -12,6 +12,9 @@ const enquiriesSlice = createSlice({
   name: 'enquiries',
   initialState,
   reducers: {
+    setEnquiries(state, action) {
+      state.items = action.payload;
+    },
     submitEnquiry: {
       reducer(state, action) {
         state.items.unshift(action.payload);
@@ -41,6 +44,6 @@ const enquiriesSlice = createSlice({
   },
 });
 
-export const { submitEnquiry, setEnquiryStatus, deleteEnquiry } = enquiriesSlice.actions;
+export const { setEnquiries, submitEnquiry, setEnquiryStatus, deleteEnquiry } = enquiriesSlice.actions;
 export const ENQUIRIES_STORAGE_KEY = STORAGE_KEY;
 export default enquiriesSlice.reducer;

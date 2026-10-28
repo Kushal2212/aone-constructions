@@ -13,12 +13,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
-import {
-  addTestimonial,
-  updateTestimonial,
-  togglePublished,
-  deleteTestimonial,
-} from "../../store/slices/testimonialsSlice";
+import { apiRequest } from "@/services/api";
+import { loadTestimonials } from "@/services/dataApi";
+import { setTestimonials } from "../../store/slices/testimonialsSlice";
 
 import {
   AlertDialog,
@@ -89,26 +86,28 @@ function Testimonials() {
     setDialogOpen(true);
   };
 
-  const handleTogglePublished = (id) => {
-    dispatch(togglePublished(id));
-
+  const handleTogglePublished = async (id) => {
     const testimonial = testimonials.find((item) => item.id === id);
-
-    toast.success(
-      testimonial?.published
-        ? "Testimonial unpublished"
-        : "Testimonial published",
-    );
+    if (!testimonial) return;
+    try {
+      await apiRequest(`/admin/testimonials/${id}`, { method: "PATCH", body: { published: !testimonial.published } });
+      dispatch(setTestimonials(await loadTestimonials(true)));
+      toast.success(testimonial.published ? "Testimonial unpublished" : "Testimonial published");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteId) return;
-
-    dispatch(deleteTestimonial(deleteId));
-
-    setDeleteId(null);
-
-    toast.success("Testimonial deleted successfully");
+    try {
+      await apiRequest(`/admin/testimonials/${deleteId}`, { method: "DELETE" });
+      dispatch(setTestimonials(await loadTestimonials(true)));
+      setDeleteId(null);
+      toast.success("Testimonial deleted successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -431,7 +430,7 @@ function TestimonialDialog({ open, onOpenChange, testimonial }) {
     }
   }, [open, testimonial]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!clientName.trim()) {
@@ -449,34 +448,24 @@ function TestimonialDialog({ open, onOpenChange, testimonial }) {
       return;
     }
 
-    if (isEditing) {
-      dispatch(
-        updateTestimonial({
-          id: testimonial.id,
-          changes: {
-            clientName: clientName.trim(),
-            role: role.trim(),
-            message: message.trim(),
-            rating,
-          },
-        }),
-      );
-
-      toast.success("Testimonial updated successfully");
-    } else {
-      dispatch(
-        addTestimonial({
-          clientName: clientName.trim(),
-          role: role.trim(),
-          message: message.trim(),
-          rating,
-        }),
-      );
-
-      toast.success("Testimonial added successfully");
+    const body = {
+      clientName: clientName.trim(),
+      role: role.trim(),
+      message: message.trim(),
+      rating,
+    };
+    try {
+      if (isEditing) {
+        await apiRequest(`/admin/testimonials/${testimonial.id}`, { method: "PATCH", body });
+      } else {
+        await apiRequest("/admin/testimonials", { method: "POST", body });
+      }
+      dispatch(setTestimonials(await loadTestimonials(true)));
+      toast.success(isEditing ? "Testimonial updated successfully" : "Testimonial added successfully");
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(error.message);
     }
-
-    onOpenChange(false);
   };
 
   return (

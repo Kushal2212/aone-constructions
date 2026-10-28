@@ -19,6 +19,9 @@ const gallerySlice = createSlice({
   name: "gallery",
   initialState,
   reducers: {
+    setGalleryItems(state, action) {
+      state.items = action.payload;
+    },
     addGalleryImage: {
       reducer(state, action) {
         state.items.unshift(action.payload);
@@ -52,6 +55,7 @@ const gallerySlice = createSlice({
 });
 
 export const {
+  setGalleryItems,
   addGalleryImage,
   updateGalleryImage,
   toggleGalleryPublished,

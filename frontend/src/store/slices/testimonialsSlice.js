@@ -12,6 +12,9 @@ const testimonialsSlice = createSlice({
   name: 'testimonials',
   initialState,
   reducers: {
+    setTestimonials(state, action) {
+      state.items = action.payload;
+    },
     addTestimonial: {
       reducer(state, action) {
         state.items.unshift(action.payload);
@@ -46,6 +49,7 @@ const testimonialsSlice = createSlice({
 });
 
 export const {
+  setTestimonials,
   addTestimonial,
   updateTestimonial,
   togglePublished,

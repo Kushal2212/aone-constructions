@@ -12,6 +12,9 @@ const clientsSlice = createSlice({
   name: 'clients',
   initialState,
   reducers: {
+    setClients(state, action) {
+      state.items = action.payload;
+    },
     addClient: {
       reducer(state, action) {
         state.items.unshift(action.payload);
@@ -42,6 +45,6 @@ const clientsSlice = createSlice({
   },
 });
 
-export const { addClient, updateClient, deleteClient } = clientsSlice.actions;
+export const { setClients, addClient, updateClient, deleteClient } = clientsSlice.actions;
 export const CLIENTS_STORAGE_KEY = STORAGE_KEY;
 export default clientsSlice.reducer;
