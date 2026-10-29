@@ -16,15 +16,16 @@ const { notFound, errorHandler } = require("./src/middleware/errors");
 
 const app = express();
 const origins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
-  .split(",").map((origin) => origin.trim()).filter(Boolean);
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 if (process.env.NODE_ENV === "production" && !process.env.CLIENT_ORIGIN) {
   console.warn(
-    "CLIENT_ORIGIN is not set; only http://localhost:5173 is allowed by CORS. "
-    + "Set CLIENT_ORIGIN to your deployed frontend origin.",
+    "CLIENT_ORIGIN is not set; set it to your deployed frontend origin."
   );
-  credentials:true
 }
+
 
 app.disable("x-powered-by");
 // The API always runs behind a reverse proxy in production (Render, Railway,
@@ -39,7 +40,7 @@ app.use(cors({
     error.statusCode = 403;
     callback(error);
   },
-  credentials: false,
+  credentials: true,
 }));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: false, limit: "1mb" }));
