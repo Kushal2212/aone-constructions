@@ -41,7 +41,7 @@ router.post(
     const matchesConfiguredCredentials = securelyMatches(parsed.data.email, configuredEmail)
       && securelyMatches(parsed.data.password, process.env.ADMIN_PASSWORD);
     const matches = matchesStoredHash || matchesConfiguredCredentials;
-    if (!matches) {
+    if (!matches || !admin) {
       return res.status(401).json({ error: "Incorrect email or password." });
     }
 

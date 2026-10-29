@@ -42,6 +42,7 @@ To explicitly apply the `ADMIN_PASSWORD` from `backend/.env` to the existing acc
 | Method | Path | Access | Purpose |
 |---|---|---|---|
 | GET | `/api/health` | Public | Liveness check |
+| GET | `/api/ready` | Public | Readiness check (503 until MongoDB is connected) |
 | POST | `/api/auth/login` | Public, rate-limited | Admin login |
 | GET | `/api/auth/me` | Admin | Current admin identity |
 | PATCH | `/api/auth/me` | Admin | Update current admin name/email |
@@ -87,3 +88,41 @@ curl -X POST http://localhost:5000/api/admin/media/upload \
 ```
 
 The Vite frontend uses `/api` by default and proxies API requests to `http://localhost:5000` during development. Copy `frontend/.env.example` to `frontend/.env.local` for local setup. For a deployed frontend, set `VITE_API_URL` to the backend API base URL (including `/api`) and set the backend `CLIENT_ORIGIN` to the frontend's exact origin.
+
+## Tests
+
+```sh
+npm test
+```
+
+Eleven tests cover login fallbacks, Redis-less operation, health, auth guards, validation, pagination, and media auth. They run offline against the Express app — no MongoDB or Redis needed.
+
+## Deployment
+
+The API is a long-running Node process (MongoDB connection + optional Redis client), so it belongs on a Node or Docker host, not a static host.
+
+**Render:** [`../render.yaml`](../render.yaml) defines the service (`rootDir: backend`, `npm ci --omit=dev`, health check `/api/health`). Fill in the secret env vars in the dashboard.
+
+**Railway / Fly.io / VPS:** use the included `Dockerfile`:
+
+```sh
+docker build -t aone-api .
+docker run -p 5000:5000 --env-file .env aone-api
+```
+
+Production environment:
+
+| Variable | Value |
+|---|---|
+| `NODE_ENV` | `production` |
+| `CLIENT_ORIGIN` | Exact frontend origin(s), comma-separated. Required — this is the CORS allowlist. |
+| `TRUST_PROXY` | `1` behind Render/Railway/Fly/Vercel |
+| `MONGODB_URI` | Atlas URI; allowlist the host IP or `0.0.0.0/0` |
+| `JWT_SECRET` | 32+ random characters |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Bootstrap admin (password 12+ characters) |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Media uploads |
+| `REDIS_URL` | Optional; `rediss://` for hosted Redis |
+
+Environment variables are loaded by `src/config/env.js`, which every entry point requires first, so values such as `CLIENT_ORIGIN` and `MEDIA_MAX_FILE_SIZE_MB` are read after `.env` is applied. Do not require modules before it.
+
+`app.set("trust proxy", TRUST_PROXY)` is applied so `express-rate-limit` reads the real client IP behind a platform proxy. Leave `TRUST_PROXY=1` unless you add more proxy hops.

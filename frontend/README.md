@@ -1,17 +1,39 @@
-# A.one Construction frontend
+# A.one Brain Construction — Frontend
+
+React 19 + Vite single-page app for the public website and the admin panel. Data comes from the Express API in [`../backend`](../backend).
 
 ## Local development
 
-1. Start the backend by following [the backend setup guide](../backend/README.md).
-2. In `frontend`, install dependencies and start Vite:
+```sh
+cp .env.example .env
+npm install
+npm run dev
+```
 
-   ```sh
-   npm install
-   npm run dev
-   ```
+`.env` values:
 
-Vite proxies `/api` requests to `http://localhost:5000` by default, so the browser uses the backend without a separate CORS setup in development. To use a different local API host, set `VITE_API_PROXY_TARGET` before starting Vite.
+| Variable | Purpose |
+|---|---|
+| `VITE_API_URL` | API base URL including `/api`. Use `/api` to go through the Vite dev proxy, or the full deployed API URL. |
+| `VITE_API_PROXY_TARGET` | Only used by the dev proxy; defaults to `http://localhost:5000`. |
 
-Copy `.env.example` to `.env.local` if you want to set `VITE_API_URL`. Keep `/api` for local development; for deployment, set it to the full backend API URL, such as `https://api.example.com/api`. The backend's `CLIENT_ORIGIN` must include the deployed frontend origin.
+The dev server proxies `/api` to the backend (see `vite.config.js`), so `VITE_API_URL=/api` works without CORS configuration locally.
 
-The admin login uses the account bootstrapped by the backend from `ADMIN_EMAIL` and `ADMIN_PASSWORD`. Project and gallery file uploads require Cloudinary credentials in the backend environment.
+## Scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the dev server on http://localhost:5173 |
+| `npm run build` | Production build into `dist/` |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | Run oxlint |
+
+## Deploy to Vercel
+
+1. Import the repository in Vercel.
+2. Set **Root Directory** to `frontend` (skip if this repo only contains the frontend).
+3. Framework preset: **Vite**. Build command `npm run build`, output `dist` (already set in `vercel.json`).
+4. Add environment variable `VITE_API_URL=https://<your-api-host>/api`.
+5. Deploy, then add the resulting domain to the backend's `CLIENT_ORIGIN` allowlist.
+
+`vercel.json` also adds SPA rewrites (so `/admin/projects` works on refresh) and long-lived caching for hashed assets.

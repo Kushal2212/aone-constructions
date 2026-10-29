@@ -1,3 +1,4 @@
+require("./src/config/env");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -17,7 +18,18 @@ const app = express();
 const origins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
   .split(",").map((origin) => origin.trim()).filter(Boolean);
 
+if (process.env.NODE_ENV === "production" && !process.env.CLIENT_ORIGIN) {
+  console.warn(
+    "CLIENT_ORIGIN is not set; only http://localhost:5173 is allowed by CORS. "
+    + "Set CLIENT_ORIGIN to your deployed frontend origin.",
+  );
+}
+
 app.disable("x-powered-by");
+// The API always runs behind a reverse proxy in production (Render, Railway,
+// Fly, Vercel), so trust exactly one proxy hop. Without this, express-rate-limit
+// cannot read the real client IP and every visitor shares one rate limit bucket.
+app.set("trust proxy", Number(process.env.TRUST_PROXY ?? 1));
 app.use(helmet());
 app.use(cors({
   origin(origin, callback) {
@@ -38,6 +50,14 @@ app.use("/api", rateLimit({
 }));
 
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+app.get("/api/ready", (req, res) => {
+  const mongoose = require("mongoose");
+  const databaseReady = mongoose.connection.readyState === 1;
+  res.status(databaseReady ? 200 : 503).json({
+    status: databaseReady ? "ready" : "starting",
+    database: databaseReady ? "connected" : "disconnected",
+  });
+});
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes.publicRouter);
 app.use("/api/admin/projects", projectRoutes.adminRouter);

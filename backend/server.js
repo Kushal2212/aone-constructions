@@ -1,4 +1,4 @@
-const dotenv = require("dotenv");
+require("./src/config/env");
 const bcrypt = require("bcryptjs");
 const { z } = require("zod");
 const app = require("./app");
@@ -7,10 +7,6 @@ const Setting = require("./src/models/Setting");
 const { connectDatabase } = require("./src/config/database");
 const { connectRedis, closeRedis } = require("./src/config/redis");
 const { configureCloudinary } = require("./src/config/cloudinary");
-
-dotenv.config({
-  path: "./.env" 
-});
 
 async function ensureAdmin() {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();

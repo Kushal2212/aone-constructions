@@ -16,7 +16,7 @@ async function writeCache(key, value, seconds) {
   const redis = getRedisClient();
   if (!redis) return;
   try {
-    await redis.set(key, JSON.stringify(value), { EX: seconds });
+    await redis.set(key, JSON.stringify(value), "EX", seconds);
   } catch (error) {
     console.error("Redis cache write failed:", error.message);
   }
@@ -27,12 +27,12 @@ async function invalidateCache(...patterns) {
   if (!redis) return;
   try {
     for (const pattern of patterns) {
-      let cursor = 0;
+      let cursor = "0";
       do {
-        const result = await redis.scan(cursor, { MATCH: pattern, COUNT: 100 });
-        cursor = result.cursor;
-        if (result.keys.length) await redis.del(result.keys);
-      } while (Number(cursor) !== 0);
+        const [nextCursor, keys] = await redis.scan(cursor, "MATCH", pattern, "COUNT", 100);
+        cursor = nextCursor;
+        if (keys.length) await redis.del(...keys);
+      } while (cursor !== "0");
     }
   } catch (error) {
     console.error("Redis cache invalidation failed:", error.message);
