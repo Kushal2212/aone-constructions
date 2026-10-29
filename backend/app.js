@@ -23,6 +23,7 @@ if (process.env.NODE_ENV === "production" && !process.env.CLIENT_ORIGIN) {
     "CLIENT_ORIGIN is not set; only http://localhost:5173 is allowed by CORS. "
     + "Set CLIENT_ORIGIN to your deployed frontend origin.",
   );
+  credentials:true
 }
 
 app.disable("x-powered-by");
