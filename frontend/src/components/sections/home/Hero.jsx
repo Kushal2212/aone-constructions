@@ -25,7 +25,7 @@ function Hero() {
           </h1>
 
           {/* Description */}
-          <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+          <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg ">
             A.one Brain Construction Pvt. Ltd. delivers reliable construction
             and engineering solutions designed around quality, modern
             technology, and the needs of every client.

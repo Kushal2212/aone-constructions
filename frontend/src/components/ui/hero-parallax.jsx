@@ -8,109 +8,94 @@ const projects = [
   {
     title: "Modern Residential Building",
     category: "Residential Construction",
-    image:
-      "/projects/photo-01.avif",
+    image: "/projects/photo-01.avif",
     link: "/projects",
   },
   {
     title: "Contemporary House",
     category: "House Construction",
-    image:
-      "/projects/photo-02.avif",
+    image: "/projects/photo-02.avif",
     link: "/projects",
   },
   {
     title: "Structural Development",
     category: "Structural Construction",
-    image:
-      "/projects/photo-03.avif",
+    image: "/projects/photo-03.avif",
     link: "/projects",
   },
   {
     title: "Commercial Building",
     category: "Building Construction",
-    image:
-      "/projects/photo-04.avif",
+    image: "/projects/photo-04.avif",
     link: "/projects",
   },
   {
     title: "Construction Planning",
     category: "Engineering & Planning",
-    image:
-      "/projects/photo-05.avif",
+    image: "/projects/photo-05.avif",
     link: "/projects",
   },
 
   {
     title: "Site Development",
     category: "Site Supervision",
-    image:
-      "/projects/photo-06.avif",
+    image: "/projects/photo-06.avif",
     link: "/projects",
   },
   {
     title: "Residential Project",
     category: "Residential Construction",
-    image:
-      "/projects/photo-07.avif",
+    image: "/projects/photo-07.avif",
     link: "/projects",
   },
   {
     title: "Engineering Works",
     category: "Engineering Services",
-    image:
-      "/projects/photo-08.avif",
+    image: "/projects/photo-08.avif",
     link: "/projects",
   },
   {
     title: "Modern Construction",
     category: "Modern Technology",
-    image:
-      "/projects/photo-09.avif",
+    image: "/projects/photo-09.avif",
     link: "/projects",
   },
   {
     title: "Building Development",
     category: "Construction",
-    image:
-      "/projects/photo-10.avif",
+    image: "/projects/photo-10.avif",
     link: "/projects",
   },
 
   {
     title: "Site Execution",
     category: "Project Execution",
-    image:
-      "/projects/photo-11.avif",
+    image: "/projects/photo-11.avif",
     link: "/projects",
   },
- 
+
   {
     title: "Project HandOver",
     category: "Site Supervision",
-    image:
-      "/projects/photo-12.avif",
+    image: "/projects/photo-12.avif",
     link: "/projects",
   },
   {
     title: "Hydro Power",
     category: "Site Supervision",
-    image:
-      "/projects/project-01.jpg",
+    image: "/projects/project-01.jpg",
     link: "/projects",
   },
   {
     title: "Project Madi",
     category: "Site Supervision",
-    image:
-      "/projects/project-02.jpg",
+    image: "/projects/project-02.jpg",
     link: "/projects",
   },
   {
     title: "Project End",
     category: "Site Supervision",
-    image:
-      "/projects/project-03.jpg",
+    image: "/projects/project-03.jpg",
     link: "/projects",
   },
 ];
@@ -291,6 +276,7 @@ function HeroHeader() {
             text-base leading-7
             text-slate-700
             sm:text-lg
+            dark:text-gray-300
           "
         >
           From planning and engineering to construction and site supervision, we
@@ -302,40 +288,40 @@ function HeroHeader() {
           <Button
             nativeButton={false}
             size="lg"
-            render={<Link to="/contact"/>}
-            className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition-all duration-300 hover:bg-transparent hover:shadow-lg hover:shadow-slate-900/20"
+            render={<Link to="/contact" />}
+            className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-slate-900 px-5 text-sm font-semibold text-white  transition-all duration-300 hover:bg-transparent hover:shadow-lg hover:shadow-slate-900/20"
           >
-              <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2 hover:text-slate-900">
-                Start a Project
-              </span>
+            <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2 hover:text-slate-900 dark:hover:text-white">
+              Start a Project
+            </span>
 
-              <ArrowUpRight
-                className="
+            <ArrowUpRight
+              className="
                     absolute right-4 top-1/2 size-4 -translate-y-1/2
-                    text-primary opacity-70
+                    text-secondary opacity-70
                     transition-all duration-300 ease-out
                     group-hover:right-3.5
                     group-hover:translate-x-0.5
                     group-hover:opacity-100
                     group-hover:text-slate-900
+                    dark:group-hover:text-white
                   "
-              />
-            
+            />
           </Button>
 
           {/* Secondary CTA — same sliding-text pattern, outline style */}
           <Button
             nativeButton={false}
             size="lg"
-            render={<Link to="/contact"/>}
-            className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-white px-5 text-sm font-semibold text-primary transition-all duration-300 hover:bg-transparent hover:shadow-lg hover:shadow-slate-900/20"
+            render={<Link to="/contact" />}
+            className="group relative h-12 min-w-[190px] overflow-hidden rounded-full bg-white dark:bg-slate-800 px-5 text-sm font-semibold text-primary transition-all duration-300 hover:bg-transparent dark:hover:bg-transparent hover:shadow-lg hover:shadow-slate-900/20"
           >
-              <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
-                Start a Project
-              </span>
+            <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:-translate-x-2">
+              Contact us
+            </span>
 
-              <ArrowUpRight
-                className="
+            <ArrowUpRight
+              className="
                       absolute right-4 top-1/2 size-4 -translate-y-1/2
                       text-primary opacity-70
                       transition-all duration-300 ease-out
@@ -343,9 +329,9 @@ function HeroHeader() {
                       group-hover:translate-x-0.5
                       group-hover:opacity-100
                       group-hover:text-slate-900
+                      dark:group-hover:text-white
                     "
-              />
-            
+            />
           </Button>
         </div>
       </div>
