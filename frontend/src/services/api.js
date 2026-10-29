@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta.env.VIT_API_URL || "/api").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 const SESSION_KEY = "aone_construction_admin_session";
 
 export class ApiError extends Error {
